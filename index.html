@@ -6,10 +6,10 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://cdn.jsdelivr.net; font-src https://cdn.jsdelivr.net data:; img-src 'self' data: blob:; connect-src 'self' https://generativelanguage.googleapis.com https://cdn.jsdelivr.net; worker-src 'self' blob: https://cdn.jsdelivr.net; frame-src 'none'; object-src 'none'; base-uri 'self'" />
   <meta name="referrer" content="no-referrer" />
   <title>딱 거기까지 — 오늘 수업이 끝난 데까지만 만드는 AI 해설지</title>
-  <meta name="description" content="교안과 수업 녹음 전사로, 교수님이 실제로 수업한 쪽까지만 해설지와 회상 퀴즈를 만듭니다. 교안·수업 녹음·AI 보충을 문장마다 구분합니다." />
-  <meta name="theme-color" content="#f6f5f1" />
+  <meta name="description" content="강의교안과 내 필기로, 오늘 수업이 실제로 나간 쪽까지만 해설지와 회상 퀴즈를 만듭니다. 교안·필기·AI 보충을 문장마다 구분합니다." />
+  <meta name="theme-color" content="#ffffff" />
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" integrity="sha384-GIdEBaqGN9mNkDkMkzMHW8EKUqtpPIe/sLj1X7DIrnc9uPtLROJgmuDlh+3rBw0j" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.css" integrity="sha384-y9k2lBaj/ETgBd4674Kql3098euvZU5fWlBcBBrlROBI6c2KDmjWhd508Rfsx9R/" crossorigin="anonymous" />
   <link rel="stylesheet" href="css/app.css" />
   <script type="module" src="js/app.js"></script>
 </head>
@@ -41,14 +41,13 @@
     <section class="view view--home" data-view="home" aria-labelledby="home-title">
       <div class="hero">
         <div class="hero__copy">
-          <p class="eyebrow">교안 + 수업 녹음 → 해설지 · 회상 퀴즈</p>
           <h1 id="home-title" class="hero__title">오늘 수업,<br /><span class="redline">딱 거기까지</span>만.</h1>
-          <p class="hero__lead">교수님이 교안을 다 못 나간 날에도, <strong>실제로 수업한 쪽까지만</strong> 해설지를 만듭니다. 슬라이드 글과 교수님 말을 함께 읽고, 문장마다 <span class="tag tag--slide">교안</span> <span class="tag tag--lecture">수업 녹음</span> <span class="tag tag--ai">AI 보충</span>을 표시해요.</p>
+          <p class="hero__lead">교수님이 교안을 다 못 나간 날에도, <strong>실제로 수업한 쪽까지만</strong> 해설지를 만듭니다. 교안과 수업 시간에 적은 내 필기를 쪽마다 짝지어 읽고, 문장마다 <span class="tag tag--slide">교안</span> <span class="tag tag--note">필기</span> <span class="tag tag--ai">AI 보충</span>을 표시해요.</p>
           <div class="hero__cta">
             <button class="btn btn--primary btn--lg" type="button" data-action="demo-start">예시 수업으로 30초 체험</button>
             <a class="btn btn--ghost btn--lg" href="#/make">내 수업으로 만들기</a>
           </div>
-          <p class="hero__note">가입 없음 · 무료 · 녹음과 교안은 내 브라우저 밖으로 나가지 않아요</p>
+          <p class="hero__note">가입 없음 · 무료 · 교안과 필기는 이 브라우저 안에서만 처리돼요</p>
         </div>
         <figure class="hero__visual" aria-label="예시: 12쪽짜리 교안 중 8쪽에서 수업이 끝남">
           <div class="mini-strip" id="hero-strip"></div>
@@ -57,34 +56,34 @@
       </div>
 
       <div class="band">
-        <h2 class="band__title">만든 이유 — 직접 겪은 두 가지</h2>
-        <div class="quotes">
-          <blockquote class="quote">
-            <p>“수업을 나갔는데 교안을 다 안 끝내서 그다음 주에 마저 나가는 거지. 그러면 <mark>불완전한 해설지</mark>가 만들어져. 이걸 막고 싶었어.”</p>
-            <footer>→ 녹음으로 <b>진도선</b>을 찾아, 거기까지만 만든다</footer>
-          </blockquote>
-          <blockquote class="quote">
-            <p>“음성 전사만 하니까 <mark>정보가 너무 소실</mark>돼. 교안만 보면 교수님이 말로 덧붙인 게 빠지고.”</p>
-            <footer>→ <b>교안 + 교수님 말</b>을 쪽마다 짝지어 함께 쓴다</footer>
-          </blockquote>
-        </div>
+        <h2 class="band__title">만든 이유</h2>
+        <ol class="reasons">
+          <li>
+            <blockquote>
+              <p>“수업을 나갔는데 교안을 다 안 끝내서 그다음 주에 마저 나가는 거지. 그러면 <mark>불완전한 해설지</mark>가 만들어져. 이걸 막고 싶었어.”</p>
+              <cite>— 2026-10-01 기록</cite>
+            </blockquote>
+            <p class="reason__then">→ 필기가 있는 마지막 쪽으로 <b>진도선</b>을 찾아, 거기까지만 만든다</p>
+          </li>
+          <li>
+            <p class="reason__text">교안만 보면 수업 중에 덧붙은 설명이 빠지고, 필기만 보면 앞뒤 맥락이 끊긴다.</p>
+            <p class="reason__then">→ <b>교안 + 내 필기</b>를 쪽마다 짝지어 함께 쓴다</p>
+          </li>
+        </ol>
       </div>
 
       <div class="band">
         <h2 class="band__title">이렇게 동작해요</h2>
-        <ol class="how">
-          <li class="how__item"><span class="how__no">1</span><h3>넣기</h3><p>교안 PDF(또는 텍스트)와 수업 녹음 전사(클로바노트·다글로·Whisper 등)를 넣어요.</p></li>
-          <li class="how__item"><span class="how__no">2</span><h3>진도 감지 <small>AI 없이</small></h3><p>브라우저가 녹음 문장을 쪽마다 짝짓고, 교수님이 멈춘 쪽에 진도선을 그어요. 손으로 옮길 수도 있어요.</p></li>
-          <li class="how__item"><span class="how__no">3</span><h3>해설지 · 퀴즈</h3><p>진도선 안쪽만 담은 프롬프트를 내 AI 채팅에 붙여넣거나 Gemini 키로 만들고, 답을 먼저 떠올리는 퀴즈로 복습해요.</p></li>
+        <ol class="steps">
+          <li><b>넣기.</b>교안 PDF와 내 필기를 넣어요. 필기한 교안 PDF(굿노트·노타빌리티·삼성노트 내보내기), 교수님이 올려 주신 판서본, 타이핑한 필기 모두 돼요.</li>
+          <li><b>진도 확인.</b>브라우저가 AI 없이 쪽마다 필기가 있는지 보고, 필기가 있는 마지막 쪽을 진도선으로 제안해요. “오늘 어디까지 나갔나요?”에 확인만 하면 돼요.</li>
+          <li><b>해설지 · 퀴즈.</b>진도선 안쪽만 담은 프롬프트를 내 AI 채팅에 붙여넣거나 Gemini 키로 해설지를 만들고, 답을 먼저 떠올리는 퀴즈로 복습해요.</li>
         </ol>
       </div>
 
-      <div class="band band--trust">
-        <ul class="trust">
-          <li><b>출처 3색</b><span>교안 · 수업 녹음 · AI 보충을 문장마다 표시하고, 근거 번호를 브라우저가 다시 대조해요.</span></li>
-          <li><b>먼저 떠올리기</b><span>정답 보기 전에 내 답을 써야 해요. 틀린 문제는 끝에 다시 나와요.</span></li>
-          <li><b>주차 이어가기</b><span>“지난주 8쪽에서 멈춤 → 이번 주는 9쪽부터”를 기억해요.</span></li>
-        </ul>
+      <div class="band">
+        <h2 class="band__title">그 밖에</h2>
+        <p class="prose-band">해설지의 문장마다 <b>출처 표시</b>(교안 · 필기 · AI 보충)가 붙고, AI가 단 근거 번호는 브라우저가 내 필기와 다시 대조해요. 퀴즈는 정답을 보기 전에 내 답을 먼저 써야 하고, 틀린 문제는 끝에 다시 나와요. 과목별로 “지난주 8쪽에서 멈춤 → 이번 주는 9쪽부터”를 기억해서 다음 주에 이어 쓸 수 있어요.</p>
       </div>
     </section>
 
@@ -94,14 +93,23 @@
         <h1 id="make-title" class="view__title">해설지 만들기</h1>
         <ol class="stepper" aria-label="진행 단계">
           <li data-step="1" class="is-current"><span>1</span>넣기</li>
-          <li data-step="2"><span>2</span>진도 감지</li>
+          <li data-step="2"><span>2</span>진도 확인</li>
           <li data-step="3"><span>3</span>해설지 생성</li>
         </ol>
       </div>
 
       <!-- STEP 1 -->
       <form class="panel" id="step-input" novalidate>
-        <h2 class="panel__title"><span class="panel__no">1</span>교안과 수업 녹음 넣기</h2>
+        <h2 class="panel__title"><span class="panel__no">1</span>교안과 내 필기 넣기</h2>
+
+        <div class="consent" id="consent-make">
+          <b>먼저 읽어 주세요</b>
+          <ul>
+            <li>교안은 수강생 개인 학습용으로만 사용하고, 해설지·교안을 다른 사람과 공유하지 마세요.</li>
+            <li>처리는 이 브라우저 안에서만 됩니다. 이 사이트에는 서버가 없어요.</li>
+            <li>외부 AI 엔진(내 AI 채팅, Gemini)을 고르면 교안·필기 내용이 그 서비스로 전송됩니다.</li>
+          </ul>
+        </div>
 
         <div class="grid-2">
           <div class="field">
@@ -118,7 +126,8 @@
         <div class="carry" id="carry" hidden role="status" aria-live="polite"></div>
 
         <fieldset class="field">
-          <legend>교안</legend>
+          <legend>① 강의교안 <span class="req">필수</span></legend>
+          <p class="hint hint--top">교수님이 올려 주신 깨끗한(수업용) 교안이에요.</p>
           <div class="seg" role="tablist" aria-label="교안 넣는 방법">
             <button type="button" role="tab" class="seg__btn is-on" aria-selected="true" aria-controls="slides-pdf" id="tab-pdf" data-slides-mode="pdf">PDF 올리기</button>
             <button type="button" role="tab" class="seg__btn" aria-selected="false" aria-controls="slides-text-wrap" id="tab-text" data-slides-mode="text">텍스트 붙여넣기</button>
@@ -138,65 +147,98 @@
           </div>
         </fieldset>
 
-        <div class="field">
-          <div class="field__row">
-            <label for="transcript">수업 녹음 전사</label>
-            <label class="btn btn--small btn--ghost file-btn" for="transcript-file">파일 열기 (.txt .srt .vtt)<input id="transcript-file" type="file" accept=".txt,.srt,.vtt,text/plain,text/vtt" /></label>
+        <fieldset class="field notes-field">
+          <legend>② 필기 <span class="opt">아래 셋 중 하나 이상</span></legend>
+
+          <div class="note-src">
+            <h3 class="note-src__title"><span class="note-src__no">a</span>필기한 교안 PDF</h3>
+            <p class="hint hint--top">굿노트·노타빌리티·삼성노트에서 <b>같은 교안</b>에 필기한 뒤 PDF로 내보낸 파일이에요. 깨끗한 교안과 쪽마다 비교해서 필기가 있는 쪽을 찾아요.</p>
+            <div class="ink-kind" role="radiogroup" aria-label="이 PDF의 필기는 누구 것인가요">
+              <span class="ink-kind__q">이 필기는</span>
+              <label class="check"><input type="radio" name="ink-kind" value="mine" checked /> 내 필기</label>
+              <label class="check"><input type="radio" name="ink-kind" value="pan" /> <span>교수님 판서본 <small>(수업 후 올려 주신 필기 포함 교안)</small></span></label>
+            </div>
+            <p class="hint">교수님이 판서본을 올려 주시는 수업이면 그 PDF를 넣으세요 — 판서가 있는 쪽이 실제로 수업한 쪽입니다.</p>
+            <label class="drop drop--ink" for="ink-file">
+              <input id="ink-file" type="file" accept="application/pdf,.pdf" />
+              <span class="drop__icon drop__icon--ink" aria-hidden="true">필기</span>
+              <span class="drop__text"><b>필기한 교안 PDF 선택</b> 또는 끌어다 놓기<br /><small>교안 ①도 PDF로 올려야 비교할 수 있어요</small></span>
+            </label>
+            <p class="hint" id="ink-status" aria-live="polite"></p>
           </div>
-          <textarea id="transcript" rows="8" placeholder="참석자 1 00:00&#10;자, 시작하겠습니다. 오늘부터 3장 들어갑니다 …"></textarea>
-          <p class="hint" id="transcript-status" aria-live="polite"></p>
-          <details class="howto">
-            <summary>전사는 어떻게 얻나요?</summary>
-            <ul>
-              <li><b>클로바노트 · 다글로</b> 같은 전사 앱으로 녹음하거나 녹음 파일을 올린 뒤, 결과를 <b>텍스트(.txt)</b>로 내보내거나 전체 복사해 붙여넣으세요. “참석자 1 00:00” 형식을 그대로 읽어요.</li>
-              <li><b>Whisper</b>(내 컴퓨터에서 돌리는 음성 인식) 결과의 <b>.srt / .vtt / .txt</b> 파일도 그대로 열 수 있어요.</li>
-              <li>타임스탬프가 없어도 괜찮아요. 순서만 맞으면 진도를 찾아요.</li>
-              <li>녹음은 <b>교수님께 허락을 받은 경우에만</b> 하고, 녹음·전사는 개인 복습용으로만 써 주세요.</li>
-            </ul>
-          </details>
-        </div>
+
+          <div class="note-src">
+            <div class="field__row">
+              <h3 class="note-src__title"><span class="note-src__no">b</span><label for="notes">타이핑 필기</label></h3>
+              <label class="btn btn--small btn--ghost file-btn" for="notes-file">파일 열기 (.txt .md)<input id="notes-file" type="file" accept=".txt,.md,.markdown,text/plain,text/markdown" /></label>
+            </div>
+            <textarea id="notes" rows="9" placeholder="p.3&#10;중간값 정리: 부호 바뀌면 구간 안에 근 ★중요&#10;p.4&#10;xr = (xl + xu) / 2"></textarea>
+            <p class="hint">쪽 번호를 달면 그 아래 줄이 그 쪽 필기가 돼요: <code>p.12</code> <code>12쪽</code> <code>[12]</code> <code>#12</code> <code>12p</code>. 번호가 없는 줄은 내용으로 맞는 쪽을 찾아요. ★ · ! · 중요 · 시험 · 외워 · 헷갈 · 기출 표시는 강조로 잡아요.</p>
+            <p class="hint" id="notes-status" aria-live="polite"></p>
+          </div>
+
+          <div class="note-src">
+            <h3 class="note-src__title"><span class="note-src__no">c</span>손필기 사진 · 종이 노트</h3>
+            <details class="howto">
+              <summary>사진 속 손글씨를 텍스트로 옮기는 방법</summary>
+              <ol>
+                <li>아래 <b>“필기 옮겨 적기” 프롬프트</b>를 복사해요.</li>
+                <li>내가 쓰는 AI 채팅(ChatGPT · Gemini · Claude)에 붙여넣고, 필기 사진이나 필기한 교안 페이지를 첨부해 보내요.</li>
+                <li>AI가 <code>p.3</code>처럼 쪽 번호를 달아 옮겨 적은 글을 위 <b>b. 타이핑 필기</b> 칸에 붙여넣고, 틀린 글자는 고쳐요.</li>
+              </ol>
+              <div class="actions actions--tight">
+                <button class="btn btn--small" type="button" id="copy-transcribe">“필기 옮겨 적기” 프롬프트 복사</button>
+                <a class="btn btn--small btn--ghost" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer">ChatGPT</a>
+                <a class="btn btn--small btn--ghost" href="https://gemini.google.com/app" target="_blank" rel="noopener noreferrer">Gemini</a>
+                <a class="btn btn--small btn--ghost" href="https://claude.ai/new" target="_blank" rel="noopener noreferrer">Claude</a>
+              </div>
+              <p class="small">사진은 내가 고른 AI 서비스로만 가고, 이 사이트로는 오지 않아요. Gemini API 키로 만들 때는 필기한 교안 PDF(a)의 손글씨를 Gemini가 직접 읽어요.</p>
+            </details>
+          </div>
+        </fieldset>
 
         <div class="actions">
-          <button class="btn btn--primary" type="submit" id="analyze-btn">진도 감지하기</button>
+          <button class="btn btn--primary" type="submit" id="analyze-btn">진도 찾기</button>
           <button class="btn btn--ghost" type="button" data-action="demo-fill">예시 수업 채우기</button>
-          <span class="actions__aside">예시 파일: <a href="samples/sample-slides.pdf" download>교안 PDF</a> · <a href="samples/sample-transcript.txt" download>녹음 전사 TXT</a></span>
+          <span class="actions__aside">예시 파일: <a href="samples/sample-slides.pdf" download>교안 PDF</a> · <a href="samples/sample-slides-notes.pdf" download>필기한 교안 PDF</a> · <a href="samples/sample-notes.txt" download>타이핑 필기 TXT</a></span>
         </div>
         <p class="error" id="input-error" role="alert" hidden></p>
       </form>
 
       <!-- STEP 2 -->
       <section class="panel" id="step-coverage" hidden aria-labelledby="cov-title">
-        <h2 class="panel__title" id="cov-title"><span class="panel__no">2</span>진도 감지 결과 <span class="pill pill--det" title="AI를 쓰지 않는 규칙 기반 계산">AI 없이 · 브라우저 계산</span></h2>
+        <h2 class="panel__title" id="cov-title"><span class="panel__no">2</span>오늘 수업 어디까지 나갔나요? <span class="pill pill--det" title="AI를 쓰지 않는 규칙 기반 계산">AI 없이 · 브라우저 계산</span></h2>
         <div class="cov-summary" id="cov-summary"></div>
         <div class="strip-wrap">
           <div class="strip" id="strip" aria-hidden="true"></div>
           <div class="strip-ctrl">
-            <label for="progress-range">진도선 위치 <output id="progress-out" for="progress-range"></output></label>
+            <label for="progress-range">진도선 <output id="progress-out" for="progress-range"></output></label>
             <input id="progress-range" type="range" min="0" max="12" step="1" value="0" />
-            <button class="btn btn--small btn--ghost" type="button" id="progress-reset" hidden>자동 감지로 되돌리기</button>
+            <button class="btn btn--small btn--ghost" type="button" id="progress-reset" hidden>제안대로 되돌리기</button>
           </div>
           <ul class="legend" aria-label="범례">
-            <li><i class="sw sw--covered"></i>다룸</li>
-            <li><i class="sw sw--brief"></i>잠깐 언급</li>
-            <li><i class="sw sw--none"></i>안 다룸</li>
-            <li><i class="sw sw--em"></i>교수님 강조</li>
+            <li><i class="sw sw--ink"></i>필기 있음</li>
+            <li><i class="sw sw--light"></i>필기 조금</li>
+            <li><i class="sw sw--none"></i>필기 없음</li>
+            <li><i class="sw sw--em"></i>강조 표시</li>
             <li><i class="sw sw--line"></i>진도선 (끌어서 옮기기)</li>
           </ul>
         </div>
         <div class="cov-grid">
           <div class="card">
-            <h3 class="card__title">수업 흐름 <small>녹음 시간 → 설명한 쪽</small></h3>
-            <div class="flow" id="flow"></div>
+            <h3 class="card__title">쪽별 필기량 <small id="amount-sub"></small></h3>
+            <div class="amount" id="amount"></div>
           </div>
           <div class="card">
-            <h3 class="card__title">교수님 강조 <small id="em-count"></small></h3>
+            <h3 class="card__title">필기 강조 <small id="em-count"></small></h3>
             <ul class="em-list" id="em-list"></ul>
             <div id="preview-callout"></div>
           </div>
         </div>
         <details class="card details-card">
-          <summary class="card__title">쪽별 근거 보기 <small>어떤 녹음 문장이 어느 쪽에 짝지어졌나</small></summary>
+          <summary class="card__title">쪽별 필기 보기 <small>어떤 필기 줄이 어느 쪽에 붙었나</small></summary>
           <ol class="slide-rows" id="slide-rows"></ol>
+          <div id="unplaced"></div>
         </details>
         <div class="actions">
           <button class="btn btn--primary" type="button" id="to-generate">이 진도선으로 해설지 만들기</button>
@@ -214,7 +256,7 @@
         </div>
 
         <div class="pane" id="pane-demo" role="tabpanel" aria-labelledby="eng-demo" hidden>
-          <p id="demo-pane-text">예시 수업이라 미리 만들어 둔 해설지를 바로 보여 드려요. (실제 수업에서는 오른쪽 두 방법으로 만들어요.)</p>
+          <p id="demo-pane-text">예시 수업이라 미리 만들어 둔 해설지를 바로 보여 드려요. (실제 수업에서는 옆의 두 방법으로 만들어요.)</p>
           <button class="btn btn--primary" type="button" id="demo-guide-btn">예시 해설지 보기</button>
         </div>
 
@@ -229,6 +271,7 @@
             </li>
             <li>
               <div class="paste-steps__head"><b>내가 쓰는 AI 채팅에 붙여넣기</b> <span class="hint">새 탭으로 열려요</span></div>
+              <p class="hint" id="paste-ink-hint" hidden></p>
               <div class="actions actions--tight">
                 <a class="btn btn--ghost" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer">ChatGPT 열기</a>
                 <a class="btn btn--ghost" href="https://gemini.google.com/app" target="_blank" rel="noopener noreferrer">Gemini 열기</a>
@@ -248,7 +291,7 @@
 
         <div class="pane" id="pane-gemini" role="tabpanel" aria-labelledby="eng-gemini" hidden>
           <div class="notice">
-            <b>내 키로, 내 브라우저에서 바로 호출해요.</b> 키는 이 기기의 브라우저 저장소(localStorage)에만 저장할 수 있고, 이 사이트 서버는 없어요. 프롬프트(진도선 안쪽 교안·녹음 발췌)는 Google Gemini로 전송되고 Google 약관이 적용돼요. 공용 PC라면 저장하지 마세요.
+            <b>내 키로, 내 브라우저에서 바로 호출해요.</b> 키는 이 기기의 브라우저 저장소(localStorage)에만 저장할 수 있고, 이 사이트 서버는 없어요. 진도선 안쪽 교안·필기<span id="gemini-ink-note"></span>가 Google Gemini로 전송되고 Google 약관이 적용돼요. 공용 PC라면 저장하지 마세요.
             <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio에서 키 받기</a>
           </div>
           <div class="grid-2">
@@ -307,18 +350,18 @@
       <p class="view__lead">단국대학교 기계공학과 학생이, 제 복습 방식에서 실제로 막혔던 두 지점을 고치려고 만들었습니다.</p>
 
       <h2>왜 만들었나</h2>
-      <p>저는 강의와 실험 영상을 녹음해 전사하고, 교안과 전사를 합쳐 장별 “강의 해설지”와 실험 전 예습 노트를 만들어 왔습니다. 그러다 두 번 크게 막혔습니다.</p>
+      <p>저는 교안에 필기하면서 수업을 듣고, 교안과 필기를 합쳐 장별 “강의 해설지”를 만들어 왔습니다. 그러다 두 번 크게 막혔습니다.</p>
       <ol>
-        <li><b>교안을 다 못 나간 날.</b> 수업이 교안의 3분의 2에서 끝나고 나머지는 다음 주에 이어지는 일이 흔합니다. 교안 전체로 해설지를 만들면, 아직 안 배운 부분까지 교수님 설명 없이 채워진 <b>불완전한 해설지</b>가 생깁니다. 그래서 녹음으로 실제 진도선을 찾고, <b>딱 거기까지만</b> 만들게 했습니다.</li>
-        <li><b>전사만 쓰면 정보가 샌다.</b> 음성 전사만으로는 칠판·슬라이드의 식과 표가 빠지고, 교안만으로는 교수님이 말로 덧붙인 이유·요령·시험 힌트가 빠집니다. 그래서 <b>쪽마다 교안과 교수님 말을 짝지어</b> 함께 쓰게 했습니다.</li>
+        <li><b>교안을 다 못 나간 날.</b> 수업이 교안의 3분의 2에서 끝나고 나머지는 다음 주에 이어지는 일이 흔합니다. 교안 전체로 해설지를 만들면, 아직 안 배운 부분까지 수업 설명 없이 채워진 <b>불완전한 해설지</b>가 생깁니다. 그래서 필기가 있는 마지막 쪽으로 실제 진도선을 찾고, <b>딱 거기까지만</b> 만들게 했습니다.</li>
+        <li><b>한쪽만 쓰면 정보가 샌다.</b> 교안만으로는 수업 중에 덧붙은 이유·요령·시험 힌트가 빠지고, 필기만으로는 슬라이드의 식과 표, 앞뒤 맥락이 빠집니다. 그래서 <b>쪽마다 교안과 내 필기를 짝지어</b> 함께 쓰게 했습니다.</li>
       </ol>
       <p>또 하나, 해설지를 읽기만 하면 아는 것 같은 착각이 남습니다. 그래서 퀴즈는 <b>내 답을 먼저 써야</b> 정답이 열리고, 틀린 문제는 끝에 다시 나오게 했습니다.</p>
 
       <h2 id="why-not-gpt">왜 그냥 ChatGPT가 아닌가</h2>
       <ul class="compare">
-        <li><b>ChatGPT는 우리 반이 어디서 멈췄는지 모릅니다.</b> 교안을 통째로 주면 안 배운 쪽까지 설명합니다. 이 앱은 녹음에서 진도선을 먼저 찾고, 그 안쪽만 AI에게 보냅니다.</li>
-        <li><b>진도 감지는 AI가 아니라 규칙 계산입니다.</b> 같은 입력이면 늘 같은 결과가 나오고, 브라우저 안에서 돌며, 결과를 손으로 고칠 수 있습니다.</li>
-        <li><b>문장마다 출처가 붙습니다.</b> <span class="tag tag--slide">교안</span> <span class="tag tag--lecture">수업 녹음</span> <span class="tag tag--ai">AI 보충</span>. AI가 단 근거 번호는 브라우저가 실제 녹음과 다시 대조해서, 근거가 없으면 “AI 보충”으로 내립니다.</li>
+        <li><b>ChatGPT는 우리 반이 어디서 멈췄는지 모릅니다.</b> 교안을 통째로 주면 안 배운 쪽까지 설명합니다. 이 앱은 필기에서 진도선을 먼저 찾고, 학생이 확인한 그 안쪽만 AI에게 보냅니다.</li>
+        <li><b>진도 찾기는 AI가 아니라 규칙 계산입니다.</b> 같은 입력이면 늘 같은 결과가 나오고, 브라우저 안에서 돌며, 결과를 손으로 고칠 수 있습니다.</li>
+        <li><b>문장마다 출처가 붙습니다.</b> <span class="tag tag--slide">교안</span> <span class="tag tag--note">필기</span> <span class="tag tag--ai">AI 보충</span>. AI가 단 근거 번호는 브라우저가 실제 필기와 다시 대조해서, 근거가 없으면 “AI 보충”으로 내립니다.</li>
         <li><b>퀴즈는 떠올리기가 먼저입니다.</b> 정답을 보기 전에 답을 써야 하고, ○△✕로 스스로 채점한 뒤 틀린 것만 다시 풉니다. 첫 시도와 다시 풀기 점수를 둘 다 보여 줍니다.</li>
       </ul>
 
@@ -328,34 +371,38 @@
           <thead><tr><th scope="col">기능</th><th scope="col">방식</th><th scope="col">어디서</th></tr></thead>
           <tbody>
             <tr><td>교안 쪽 나누기 · PDF 글자 읽기</td><td>규칙 (pdf.js)</td><td>내 브라우저</td></tr>
-            <tr><td>녹음 문장 ↔ 쪽 짝짓기, 진도선</td><td>규칙 (한글 글자 묶음 TF-IDF 유사도 + 순서 모델)</td><td>내 브라우저</td></tr>
-            <tr><td>교수님 강조 · “다음 시간에” 찾기</td><td>규칙 (표현 사전)</td><td>내 브라우저</td></tr>
+            <tr><td>필기한 교안에서 필기 있는 쪽 찾기</td><td>규칙 (깨끗한 교안과 쪽마다 픽셀 비교)</td><td>내 브라우저</td></tr>
+            <tr><td>타이핑 필기 ↔ 쪽 짝짓기, 진도선 제안</td><td>규칙 (쪽 번호 표시 + 한글 글자 묶음 TF-IDF 유사도 + 순서 모델)</td><td>내 브라우저</td></tr>
+            <tr><td>★·중요·시험 강조, “다음 시간” 메모 찾기</td><td>규칙 (표시 사전)</td><td>내 브라우저</td></tr>
             <tr><td>근거 번호 대조 · 진도선 밖 내용 제거</td><td>규칙</td><td>내 브라우저</td></tr>
-            <tr><td>해설 문장 · 회상 문제 쓰기</td><td><b>생성형 AI</b> (내 ChatGPT/Gemini/Claude 또는 Gemini API)</td><td>내가 고른 AI 서비스</td></tr>
+            <tr><td>해설 문장 · 회상 문제 쓰기 (Gemini 키: 손글씨 읽기 포함)</td><td><b>생성형 AI</b> (내 ChatGPT/Gemini/Claude 또는 Gemini API)</td><td>내가 고른 AI 서비스</td></tr>
             <tr><td>주차 기록 · 시간 측정 · 퀴즈 점수</td><td>규칙</td><td>내 브라우저 저장소</td></tr>
           </tbody>
         </table>
       </div>
 
-      <h2>개인정보</h2>
-      <ul>
-        <li>이 사이트에는 서버도, 분석·추적 도구도 없습니다. 녹음 파일은 받지 않고, 교안과 전사 텍스트는 내 브라우저 안에서만 처리합니다.</li>
-        <li>브라우저 밖으로 나가는 것은 두 가지뿐입니다: ① 내가 직접 복사해서 내 AI 채팅에 붙여넣는 프롬프트, ② Gemini 키를 넣고 “Gemini로 만들기”를 눌렀을 때 Google로 가는 같은 프롬프트.</li>
-        <li>주차 기록·최근 해설지·시간 측정은 이 기기의 브라우저 저장소에만 남고, 아래 버튼으로 지울 수 있습니다.</li>
-      </ul>
+      <h2>교안 이용과 개인정보</h2>
+      <div class="consent">
+        <ul>
+          <li>교안은 수강생 개인 학습용으로만 사용하고, 해설지·교안을 다른 사람과 공유하지 마세요.</li>
+          <li>처리는 이 브라우저 안에서만 됩니다. 이 사이트에는 서버도, 분석·추적 도구도 없습니다.</li>
+          <li>외부 AI 엔진을 고르면 교안·필기 내용이 그 서비스로 전송됩니다: ① 내가 직접 복사해서 내 AI 채팅에 붙여넣는 프롬프트(와 내가 첨부한 필기), ② Gemini 키를 넣고 “Gemini로 만들기”를 눌렀을 때 Google로 가는 같은 프롬프트와 진도선 안쪽 필기한 교안 페이지 그림.</li>
+          <li>주차 기록·최근 해설지·시간 측정은 이 기기의 브라우저 저장소에만 남고, 아래 버튼으로 지울 수 있습니다.</li>
+        </ul>
+      </div>
       <p><button class="btn btn--ghost" type="button" id="wipe-data">이 브라우저의 내 기록 모두 지우기</button></p>
 
       <h2>한계 (솔직하게)</h2>
       <ul>
-        <li>진도 감지는 단어가 겹치는 정도로 짝짓습니다. 교수님이 교안과 전혀 다른 말로 설명하거나, 쪽을 크게 왔다 갔다 하면 틀릴 수 있어요. 그래서 진도선을 손으로 옮길 수 있게 했습니다.</li>
-        <li>PDF 속 그림·스캔 이미지의 글자는 읽지 못합니다 (글자가 선택되는 PDF만).</li>
-        <li>전사 품질이 결과를 좌우합니다. 수식은 전사에서 자주 깨집니다.</li>
-        <li>AI 해설은 틀릴 수 있습니다. “AI 보충” 표시는 특히 교재로 확인해 주세요.</li>
-        <li>퀴즈 채점은 스스로 합니다 (○△✕). 점수는 자기 평가입니다.</li>
+        <li>진도선은 “필기가 있는 마지막 쪽”입니다. 필기 없이 지나간 쪽이 마지막이었거나, 다음 쪽에 미리 적어 둔 메모가 있으면 틀릴 수 있어요. 그래서 “오늘 어디까지 나갔나요?”에서 꼭 확인하고 옮길 수 있게 했습니다.</li>
+        <li>필기한 교안 비교는 같은 교안 파일에 필기한 경우에 맞습니다. 쪽 순서가 바뀌었거나 다른 판의 교안이면 쪽이 어긋나요 (쪽 수가 다르면 겹치는 쪽만 비교하고 알려 드려요).</li>
+        <li>타이핑 필기의 쪽 번호가 없으면 단어가 겹치는 정도로 쪽을 찾습니다. 교안과 전혀 다른 말로 적으면 틀릴 수 있어요.</li>
+        <li>PDF 속 그림·스캔 이미지의 글자는 읽지 못합니다 (글자가 선택되는 PDF만). 손글씨 내용은 AI 엔진이 읽을 때만 해설에 쓰여요.</li>
+        <li>AI 해설은 틀릴 수 있습니다. “AI 보충” 표시는 특히 교재로 확인해 주세요. 퀴즈 채점은 스스로 합니다 (○△✕).</li>
       </ul>
 
       <h2>예시 데이터</h2>
-      <p>앱에 들어 있는 “공학수치해석 3장” 교안·녹음·해설지는 이 앱을 위해 새로 쓴 <b>창작 예시</b>입니다. 실제 교수님의 강의 자료나 녹음이 아닙니다.</p>
+      <p>앱에 들어 있는 “공학수치해석 3장” 교안·필기·해설지는 이 앱을 위해 새로 쓴 <b>창작 예시</b>입니다. 실제 교수님의 강의 자료나 실제 학생의 필기가 아닙니다.</p>
 
       <h2>사용한 공개 도구</h2>
       <p class="small">Pretendard (SIL OFL 1.1) · pdf.js 4.10.38 (Apache-2.0) · qrcode-generator 1.4.4 (MIT). 모두 버전을 고정해 jsDelivr에서 불러옵니다.</p>
@@ -364,7 +411,7 @@
 
   <footer class="footer">
     <p>딱 거기까지 · 2026 단국대학교 CTL Membership 역량 공모전 출품작 · 서버 없음, 추적 없음</p>
-    <p class="small">예시 데이터는 창작물입니다. 녹음은 교수님 동의를 받은 경우에만 사용하세요.</p>
+    <p class="small">예시 데이터는 창작물입니다. 교안은 개인 학습용으로만 쓰고 공유하지 마세요.</p>
   </footer>
 
   <dialog class="present" id="present" aria-labelledby="present-title">

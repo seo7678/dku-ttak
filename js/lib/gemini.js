@@ -1,4 +1,5 @@
 // Gemini REST call straight from the browser with the user's own key (BYOK). fetch is injectable for tests.
+// Optional images: pages of an annotated deck, each preceded by a text label such as "ink-p5" so the model can cite it.
 
 export const DEFAULT_MODEL = 'gemini-2.5-flash';
 const ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models/';
@@ -14,6 +15,7 @@ export class GeminiError extends Error {
 export function friendlyGeminiError(status, apiMessage = '') {
   const m = String(apiMessage);
   if (status === 400 && /api key/i.test(m)) return '키가 올바르지 않아요. Google AI Studio에서 복사한 키 전체를 붙여넣었는지 확인해 주세요.';
+  if (status === 413) return '보내는 내용이 너무 커요 (413). 필기 페이지 수를 줄이거나 "내 AI 채팅에 붙여넣기"를 이용해 주세요.';
   if (status === 400) return `요청을 처리하지 못했어요 (400). 모델 이름이 맞는지 확인해 주세요. ${m}`.trim();
   if (status === 401 || status === 403) return '이 키로는 사용할 수 없어요 (권한 없음). 키가 비활성화되었거나 API가 꺼져 있을 수 있어요.';
   if (status === 404) return '모델을 찾지 못했어요 (404). 모델 이름을 확인해 주세요 — 예: gemini-2.5-flash';
@@ -22,7 +24,17 @@ export function friendlyGeminiError(status, apiMessage = '') {
   return `알 수 없는 오류 (${status}). ${m}`.trim();
 }
 
-export async function generateWithGemini({ apiKey, model = DEFAULT_MODEL, prompt, fetchImpl = globalThis.fetch, signal }) {
+/** Request parts: the prompt, then for each image a label part and an inline JPEG/PNG part. */
+export function buildParts(prompt, images = []) {
+  const parts = [{ text: prompt }];
+  for (const im of images) {
+    if (im.label) parts.push({ text: im.label });
+    parts.push({ inline_data: { mime_type: im.mimeType || 'image/jpeg', data: im.data } });
+  }
+  return parts;
+}
+
+export async function generateWithGemini({ apiKey, model = DEFAULT_MODEL, prompt, images = [], fetchImpl = globalThis.fetch, signal }) {
   if (!apiKey) throw new GeminiError('Gemini API 키를 먼저 넣어 주세요.', 0);
   const id = String(model || DEFAULT_MODEL).trim().replace(/^models\//, '');
   if (!/^[\w.\-]+$/.test(id)) throw new GeminiError('모델 이름에 쓸 수 없는 글자가 있어요.', 0);
@@ -32,7 +44,7 @@ export async function generateWithGemini({ apiKey, model = DEFAULT_MODEL, prompt
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
       body: JSON.stringify({
-        contents: [{ role: 'user', parts: [{ text: prompt }] }],
+        contents: [{ role: 'user', parts: buildParts(prompt, images) }],
         generationConfig: { temperature: 0.3, responseMimeType: 'application/json' },
       }),
       signal,

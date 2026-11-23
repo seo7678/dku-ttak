@@ -1,8 +1,13 @@
-// Build one compact prompt that contains ONLY the covered slides, their aligned transcript excerpts,
-// and the professor's emphasis quotes, and asks for a strict JSON schema.
-import { formatTime } from './text.js';
+// Build one compact prompt that contains ONLY the taught slides (≤ 진도선), the student's notes on those pages,
+// and the emphasis marks found in the notes, and asks for a strict JSON schema.
+// Also: the "필기 옮겨 적기" prompt for photos / handwritten pages the user takes to their own AI chat.
 import { cueLabel } from './emphasis.js';
 import { STATUS_LABEL } from './coverage.js';
+
+export const INK_KIND = {
+  mine: { prefix: 'ink', label: '내 필기', what: '내가 필기한 교안' },
+  pan: { prefix: 'pan', label: '교수님 판서', what: '교수님이 수업 후 올려 주신 판서본(필기 포함 교안)' },
+};
 
 export const SCHEMA_EXAMPLE = `{
   "slides": [
@@ -12,19 +17,19 @@ export const SCHEMA_EXAMPLE = `{
       "summary": [
         { "text": "f(x_l)·f(x_u) < 0 이면 구간 안에 근이 있다 (중간값 정리)", "source": "교안", "refs": ["P3"] }
       ],
-      "spoken": [
-        { "text": "그래프를 먼저 그려 보고 초기 구간을 잡으라고 하셨다", "refs": ["T03"] }
+      "notes": [
+        { "text": "그래프를 먼저 그려 보고 초기 구간을 잡는다", "source": "필기", "refs": ["n10"] }
       ],
       "emphasis": [
-        { "text": "중간값 정리 조건", "quote": "이거 중요합니다.", "refs": ["T03"] }
+        { "text": "중간값 정리 조건", "quote": "★중요", "refs": ["n8"] }
       ],
       "pitfalls": [
-        { "text": "중근은 부호가 안 바뀌어 구간법으로 못 잡는다", "source": "수업", "refs": ["T03"] }
+        { "text": "중근은 부호가 안 바뀌어 구간법으로 못 잡는다", "source": "필기", "refs": ["n9"] }
       ]
     }
   ],
   "recall_questions": [
-    { "slide": 3, "type": "예측", "question": "…", "answer": "…", "refs": ["T03"] }
+    { "slide": 3, "type": "예측", "question": "…", "answer": "…", "refs": ["P3", "n8"] }
   ]
 }`;
 
@@ -33,27 +38,31 @@ export const SCHEMA_EXAMPLE = `{
  * @param {string} p.course
  * @param {number|string} p.week
  * @param {{index,label,title,text}[]} p.slides
- * @param {{id,time,text}[]} p.chunks
- * @param {ReturnType<import('./coverage.js').analyzeCoverage>} p.coverage
- * @param {number} p.progress  — 진도선 (slide index)
- * @param {number} [p.maxChars] — soft cap on the transcript part
+ * @param {{id,text,preview}[]} p.notes — parseNotes(...).items
+ * @param {ReturnType<import('./coverage.js').analyzeNotes>} p.coverage
+ * @param {number} p.progress — 진도선 (slide index)
+ * @param {{pages:number[], kind:'mine'|'pan', attached:boolean}} [p.ink] — ink pages: attached as images (Gemini)
+ *        or possibly attached by the user in their own chat (attached:false)
+ * @param {number} [p.maxChars] — soft cap on the notes part
  */
-export function buildPrompt({ course, week, slides, chunks, coverage, progress, maxChars = 60000 }) {
+export function buildPrompt({ course, week, slides, notes = [], coverage, progress, ink = null, maxChars = 40000 }) {
   const covered = slides.filter((s) => s.index <= progress);
   const upcoming = slides.filter((s) => s.index > progress);
-  const chunkById = new Map(chunks.map((c) => [c.id, c]));
+  const noteById = new Map(notes.map((n) => [n.id, n]));
   const first = covered[0]?.index ?? 1;
+  const kind = INK_KIND[ink?.kind] || INK_KIND.mine;
+  const inkPages = (ink?.pages || []).filter((p) => p <= progress);
   const L = [];
-  L.push(`너는 대학 강의 복습용 "강의 해설지"를 만드는 조교다. 아래 [교안]과 [수업 녹음 전사]만 근거로, 오늘 수업이 실제로 다룬 ${first}~${progress}쪽에 대해서만 해설지를 만든다.`);
+  L.push(`너는 대학 강의 복습용 "강의 해설지"를 만드는 조교다. 아래 [교안]과 [필기]만 근거로, 오늘 수업에서 실제로 나간 ${first}~${progress}쪽에 대해서만 해설지를 만든다.`);
   L.push('');
   L.push('## 규칙');
-  L.push(`1. ${progress}쪽 다음부터는 아직 수업에서 안 다룬 내용이다. 그 쪽들의 해설·문제는 절대 만들지 않는다.`);
-  L.push('2. 모든 문장에 출처(source)를 단다: "교안"(슬라이드에 적힌 내용, refs에 P번호), "수업"(교수님이 말한 내용, refs에 T번호 필수), "AI"(교안·녹음 어디에도 없는 보충 설명이나 추정).');
-  L.push('3. spoken에는 교안에 없고 교수님이 말로만 덧붙인 내용만 넣는다. 반드시 T번호를 단다.');
-  L.push('4. emphasis에는 아래 [교수님 강조]를 바탕으로, quote에 교수님 말을 그대로 옮긴다.');
-  L.push('5. 지어내지 않는다. 근거가 없으면 source를 "AI"로 쓴다. 숫자·공식은 교안/녹음과 똑같이 쓴다.');
-  L.push('6. recall_questions는 학생이 정답을 보기 전에 스스로 떠올리게 하는 질문 6~10개. type은 "예측"(결과를 먼저 예상), "개념", "계산" 중 하나. 답은 짧고 정확하게.');
-  L.push('7. "잠깐 언급"인 쪽은 짧게 정리한다.');
+  L.push(`1. ${progress}쪽 다음부터는 아직 수업에서 안 나간 내용이다. 그 쪽들의 해설·문제는 절대 만들지 않는다.`);
+  L.push(`2. 모든 문장에 출처(source)를 단다: "교안"(슬라이드에 적힌 내용, refs에 P번호), "필기"(필기에 적힌 내용, refs에 n번호${inkPages.length ? ` 또는 ${kind.prefix}-p번호` : ''} 필수), "AI"(교안·필기 어디에도 없는 보충 설명이나 추정).`);
+  L.push('3. notes에는 교안에 없고 필기에만 있는 내용(수업 중에 덧붙은 설명·요령·예시)을 넣는다. 반드시 필기 근거 번호를 단다.');
+  L.push('4. emphasis에는 아래 [필기 강조]를 바탕으로, quote에 필기 원문을 그대로 옮긴다.');
+  L.push('5. 지어내지 않는다. 근거가 없으면 source를 "AI"로 쓴다. 숫자·공식은 교안/필기와 똑같이 쓴다.');
+  L.push('6. 필기가 없는 쪽도 진도선 안쪽이면 교안만으로 정리한다 (출처 "교안").');
+  L.push('7. recall_questions는 학생이 정답을 보기 전에 스스로 떠올리게 하는 질문 6~10개. type은 "예측"(결과를 먼저 예상), "개념", "계산" 중 하나. 답은 짧고 정확하게.');
   L.push('8. 출력은 아래 스키마의 JSON 객체 하나만. 앞뒤 설명 없이.');
   L.push('');
   L.push('## 출력 스키마 (예시 값)');
@@ -61,37 +70,50 @@ export function buildPrompt({ course, week, slides, chunks, coverage, progress, 
   L.push('');
   L.push(`## 과목: ${course || '(미입력)'} / ${week ? week + '주차' : ''}`);
   L.push('');
-  L.push(`## [교안] — 오늘 다룬 ${first}~${progress}쪽 (P번호 = 쪽)`);
+  L.push(`## [교안] — 오늘 나간 ${first}~${progress}쪽 (P번호 = 쪽)`);
   for (const s of covered) {
     const st = coverage?.slides.find((p) => p.index === s.index)?.status;
-    L.push(`### P${s.index} (${STATUS_LABEL[st] || '다룸'})`);
+    L.push(`### P${s.index} (${STATUS_LABEL[st] || STATUS_LABEL.none})`);
     L.push(s.text.trim() || '(텍스트 없음)');
   }
   L.push('');
-  L.push('## [수업 녹음 전사] — 쪽별로 정렬된 발췌 (T번호 = 근거 번호)');
+  L.push('## [필기] — 쪽별로 정리한 필기 (n번호 = 근거 번호)');
   let used = 0;
   let truncated = false;
+  let any = false;
   for (const s of covered) {
-    const ids = coverage?.slides.find((p) => p.index === s.index)?.chunkIds || [];
+    const ids = coverage?.slides.find((p) => p.index === s.index)?.noteIds || [];
     if (!ids.length) continue;
-    L.push(`### ${s.index}쪽 설명 중`);
+    any = true;
+    L.push(`### ${s.index}쪽`);
     for (const id of ids) {
-      const c = chunkById.get(id);
-      if (!c) continue;
-      if (used + c.text.length > maxChars) {
+      const n = noteById.get(id);
+      if (!n) continue;
+      if (used + n.text.length > maxChars) {
         truncated = true;
         continue;
       }
-      used += c.text.length;
-      const t = formatTime(c.time);
-      L.push(`${c.id}${t ? ` (${t})` : ''}: ${c.text}`);
+      used += n.text.length;
+      L.push(`${n.id}: ${n.text}`);
     }
+  }
+  if (!any) L.push('(타이핑한 필기 없음)');
+  if (inkPages.length) {
+    L.push('');
+    if (ink.attached) {
+      L.push(`## [${kind.label} 이미지] — 함께 보낸 그림은 ${kind.what}의 페이지다`);
+      L.push(`각 그림 앞에 "${kind.prefix}-pN" 표시가 있다 (= 교안 N쪽). 그림 속 손글씨를 읽어 활용하고, 그 내용은 source "필기", refs에 "${kind.prefix}-pN"으로 인용한다. 인쇄된 교안 글자는 [교안]과 같으니 P번호로 인용한다. 읽기 어려운 글씨는 추측하지 말고 넘어간다.`);
+    } else {
+      L.push(`## [${kind.label} 첨부] — 선택`);
+      L.push(`이 대화에 ${kind.what} PDF나 페이지 그림이 첨부되어 있다면, 손글씨를 읽어 활용하고 refs에 "${kind.prefix}-pN"(N = 교안 쪽)으로 인용한다. 첨부가 없으면 이 항목은 무시한다.`);
+    }
+    L.push(`필기가 있는 쪽: ${inkPages.map((p) => `${kind.prefix}-p${p}`).join(', ')}`);
   }
   const ems = (coverage?.emphasis || []).filter((e) => e.slideIndex != null && e.slideIndex <= progress);
   if (ems.length) {
     L.push('');
-    L.push('## [교수님 강조] — 녹음에서 찾은 강조 표현');
-    for (const e of ems) L.push(`- ${e.slideIndex}쪽 · ${e.chunkId} · [${e.cues.map(cueLabel).join(', ')}] "${e.sentence}"`);
+    L.push('## [필기 강조] — 필기에서 찾은 ★·중요·시험 같은 표시');
+    for (const e of ems) L.push(`- ${e.slideIndex}쪽 · ${e.noteId} · [${e.cues.map(cueLabel).join(', ')}] "${e.text}"`);
   }
   if (upcoming.length) {
     L.push('');
@@ -99,5 +121,31 @@ export function buildPrompt({ course, week, slides, chunks, coverage, progress, 
   }
   L.push('');
   L.push('JSON만 출력하라.');
-  return { text: L.join('\n'), truncated, coveredCount: covered.length };
+  return { text: L.join('\n'), truncated, coveredCount: covered.length, inkPages };
+}
+
+/**
+ * "필기 옮겨 적기": a prompt the user sends to their own AI chat together with photos of paper notes or pages of a
+ * handwritten deck. The reply is page-marked text that goes straight into the 타이핑 필기 box.
+ * @param {{index:number,label:string,title:string}[]} [slides] — titles help the AI match a photo to a page
+ */
+export function buildTranscribePrompt(slides = []) {
+  const L = [];
+  L.push('첨부한 사진(또는 PDF 페이지)은 대학 수업 교안에 적은 손글씨 필기다. 손으로 쓴 글씨만 그대로 옮겨 적어 줘.');
+  L.push('');
+  L.push('## 규칙');
+  L.push('1. 교안 쪽마다 맨 앞에 "p.쪽번호" 한 줄을 쓰고, 그 아래에 그 쪽의 손글씨를 한 줄씩 적는다. 예:');
+  L.push('p.3');
+  L.push('중간값 정리 → 부호 바뀌면 근 있음 ★');
+  L.push('2. 인쇄된 교안 글자는 옮기지 않는다. 손으로 쓴 글씨·기호·화살표만.');
+  L.push('3. 별표·동그라미·밑줄로 강조한 곳은 줄 끝에 ★를 붙인다. "중요", "시험" 같은 말은 그대로 적는다.');
+  L.push('4. 읽기 어려운 글자는 [?]로 표시한다. 추측해서 채우거나, 요약·설명을 덧붙이지 않는다.');
+  L.push('5. 쪽 번호가 보이지 않으면 아래 교안 제목 목록에서 내용이 맞는 쪽을 고른다. 모르겠으면 p. 줄 없이 적는다.');
+  L.push('6. 답은 옮겨 적은 글만. 앞뒤 설명 없이.');
+  if (slides.length) {
+    L.push('');
+    L.push('## 교안 쪽 제목');
+    for (const s of slides) L.push(`p.${s.label} ${s.title}`);
+  }
+  return L.join('\n');
 }

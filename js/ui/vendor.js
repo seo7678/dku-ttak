@@ -1,4 +1,5 @@
-// Pinned third-party code, loaded on demand from jsDelivr: pdf.js (PDF text) and qrcode-generator (발표 모드 QR).
+// Pinned third-party code, loaded on demand from jsDelivr: pdf.js (PDF text + page images for ink detection)
+// and qrcode-generator (발표 모드 QR).
 
 export const PDFJS_VERSION = '4.10.38';
 const PDF_BASE = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${PDFJS_VERSION}/`;
@@ -24,8 +25,8 @@ export function loadPdfjs() {
   return pdfPromise;
 }
 
-/** Extract per-page text. Items on the same line are joined without inserting spaces inside Korean words. */
-export async function extractPdfPages(file, onProgress) {
+/** Open a PDF File with pdf.js. Fails loudly (instead of hanging) if the worker cannot start. */
+async function openDoc(file) {
   const lib = await loadPdfjs();
   const data = new Uint8Array(await file.arrayBuffer());
   const task = lib.getDocument({
@@ -35,7 +36,6 @@ export async function extractPdfPages(file, onProgress) {
     cMapPacked: true,
     standardFontDataUrl: PDF_BASE + 'standard_fonts/',
   });
-  // If the worker cannot start (blocked network/CSP), pdf.js waits forever; fail loudly instead.
   let timer;
   const timeout = new Promise((_, reject) => {
     timer = setTimeout(() => {
@@ -44,7 +44,81 @@ export async function extractPdfPages(file, onProgress) {
       reject(new Error('PDF 처리기가 응답하지 않아요'));
     }, 45000);
   });
-  const doc = await Promise.race([task.promise, timeout]).finally(() => clearTimeout(timer));
+  return Promise.race([task.promise, timeout]).finally(() => clearTimeout(timer));
+}
+
+/** Render one page onto a white canvas `width` px wide (height from the page ratio, or forced to `height`). */
+async function renderPage(page, width, height) {
+  const base = page.getViewport({ scale: 1 });
+  const vp = page.getViewport({ scale: width / base.width });
+  const c = document.createElement('canvas');
+  c.width = Math.round(vp.width);
+  c.height = Math.round(vp.height);
+  const ctx = c.getContext('2d', { willReadFrequently: true });
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, c.width, c.height);
+  await page.render({ canvasContext: ctx, viewport: vp }).promise;
+  if (!height || height === c.height) return c;
+  // Annotated exports sometimes have a slightly different page box: resample to the clean page's size.
+  const out = document.createElement('canvas');
+  out.width = c.width;
+  out.height = height;
+  const octx = out.getContext('2d', { willReadFrequently: true });
+  octx.fillStyle = '#ffffff';
+  octx.fillRect(0, 0, out.width, out.height);
+  octx.drawImage(c, 0, 0, out.width, out.height);
+  return out;
+}
+
+/**
+ * Per-page grayscale renders (Uint8Array, 0..255) for ink detection.
+ * @param {File} file
+ * @param {{width?:number, sizes?:{width:number,height:number}[], onProgress?:(i:number,n:number)=>void}} [o]
+ *   sizes: force page i to this size (used to match the annotated deck to the clean deck pixel for pixel)
+ */
+export async function renderGrayPages(file, { width = 320, sizes = null, onProgress } = {}) {
+  const doc = await openDoc(file);
+  const out = [];
+  try {
+    for (let i = 1; i <= doc.numPages; i++) {
+      const page = await doc.getPage(i);
+      const target = sizes?.[i - 1];
+      const c = await renderPage(page, target ? target.width : width, target ? target.height : null);
+      const { data } = c.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, c.width, c.height);
+      const gray = new Uint8Array(c.width * c.height);
+      for (let k = 0, p = 0; k < gray.length; k++, p += 4) gray[k] = (data[p] * 299 + data[p + 1] * 587 + data[p + 2] * 114) / 1000;
+      out.push({ gray, width: c.width, height: c.height });
+      page.cleanup();
+      onProgress?.(i, doc.numPages);
+    }
+  } finally {
+    await doc.destroy();
+  }
+  return out;
+}
+
+/** JPEG (base64, no data: prefix) of selected 1-based pages, `width` px wide — sent to Gemini as images. */
+export async function renderJpegPages(file, pageNumbers, { width = 1024, quality = 0.82, onProgress } = {}) {
+  const doc = await openDoc(file);
+  const out = [];
+  try {
+    const want = pageNumbers.filter((p) => p >= 1 && p <= doc.numPages);
+    for (const [k, p] of want.entries()) {
+      const page = await doc.getPage(p);
+      const c = await renderPage(page, width, null);
+      out.push({ page: p, mimeType: 'image/jpeg', data: c.toDataURL('image/jpeg', quality).split(',')[1] });
+      page.cleanup();
+      onProgress?.(k + 1, want.length);
+    }
+  } finally {
+    await doc.destroy();
+  }
+  return out;
+}
+
+/** Extract per-page text. Items on the same line are joined without inserting spaces inside Korean words. */
+export async function extractPdfPages(file, onProgress) {
+  const doc = await openDoc(file);
   const pages = [];
   for (let i = 1; i <= doc.numPages; i++) {
     const page = await doc.getPage(i);
@@ -112,13 +186,13 @@ export async function qrSvg(text) {
   const bg = document.createElementNS(NS, 'rect');
   bg.setAttribute('width', size);
   bg.setAttribute('height', size);
-  bg.setAttribute('fill', '#fff');
+  bg.setAttribute('fill', '#ffffff');
   el.append(bg);
   let d = '';
   for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (qr.isDark(r, c)) d += `M${c + margin} ${r + margin}h1v1h-1z`;
   const path = document.createElementNS(NS, 'path');
   path.setAttribute('d', d);
-  path.setAttribute('fill', '#161c28');
+  path.setAttribute('fill', '#202020');
   el.append(path);
   return el;
 }

@@ -2,7 +2,7 @@
   "name": "ttak-geogikkaji",
   "private": true,
   "version": "1.0.0",
-  "description": "딱 거기까지 — 교안 + 수업 녹음으로, 오늘 수업이 실제로 끝난 데까지만 만드는 AI 해설지 (static site, no build step)",
+  "description": "딱 거기까지 — 교안 + 필기로, 오늘 수업이 실제로 끝난 데까지만 만드는 AI 해설지 (static site, no build step)",
   "type": "module",
   "scripts": {
     "test": "node --test"

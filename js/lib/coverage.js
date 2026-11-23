@@ -1,135 +1,138 @@
-// 진도 감지: map transcript chunks onto slides and find the last substantively covered slide.
-// Deterministic — no AI. Similarity = TF-IDF cosine over Hangul char 2/3-grams + Latin/number tokens;
-// sequence = Viterbi path that prefers moving forward one slide at a time (lectures mostly do).
+// 진도 찾기: where did today's class stop, judged from the student's notes (typed text and/or ink on the deck).
+// Deterministic — no AI.
+// - Typed notes anchored to a page (p.12, 12쪽 …) belong to that page.
+// - Unanchored note paragraphs are aligned to slides: TF-IDF cosine over Hangul char 2/3-grams + Latin/number
+//   tokens, then a Viterbi path that prefers moving forward one slide at a time (notes follow the class order).
+//   Anchored blocks take part in the same path as fixed points, so a loose line between p.4 and p.5 lands near them.
+// - Ink (필기한 교안 PDF vs 수업용 교안) comes in as per-page 'ink' | 'light' | 'none' from ink.js.
+// Per page: 필기 있음 / 필기 조금 / 필기 없음. Suggested 진도선 = last page with notes (max of text and ink).
 import { features, idfOf, tfidf, cosine } from './text.js';
-import { isPreviewSentence, detectEmphasis } from './emphasis.js';
+import { detectEmphasis } from './emphasis.js';
+import { noteBlocks } from './notes.js';
 
-export const STATUS = { COVERED: 'covered', BRIEF: 'brief', NONE: 'none' };
-export const STATUS_LABEL = { covered: '다룸', brief: '잠깐 언급', none: '안 다룸' };
+export const STATUS = { INK: 'ink', LIGHT: 'light', NONE: 'none' };
+export const STATUS_LABEL = { ink: '필기 있음', light: '필기 조금', none: '필기 없음' };
+const RANK = { none: 0, light: 1, ink: 2 };
 
 const DEFAULTS = {
-  minSim: 0.035, // below this a chunk is treated as off-topic (출석, 잡담 …)
+  minSim: 0.035, // an unanchored block below this matches no slide (date line, 잡담 메모 …)
+  alignMinSim: 0.1, // an unanchored block needs this much similarity to move the 진도선
   stepPenalty: 0.12, // moving to the next slide
   skipPenalty: 0.3, // each additional slide skipped forward
   backPenalty: 0.55, // going back to an earlier slide
   startPenalty: 0.08, // per slide away from the first slide at the start
-  coverRatio: 0.4, // a slide is "covered" if it got ≥ 40% of the median talk time of talked-about slides
-  coverMinChars: 60,
-  emitRef: 0.3, // chunks whose best similarity is below this get damped emissions (transitions dominate)
-  coverMinSim: 0.2, // "다룸" needs at least one chunk that matches the slide this well
+  emitRef: 0.3, // blocks whose best similarity is below this get damped emissions (transitions dominate)
+  fixedEmit: 5, // anchored blocks: emission +5 on their page, −5 elsewhere (a hard constraint in practice)
+  fullChars: 30, // ≥ this many characters of typed notes on a page → 필기 있음, fewer → 필기 조금
 };
+
+export function maxStatus(a, b) {
+  return (RANK[a] ?? 0) >= (RANK[b] ?? 0) ? a || 'none' : b || 'none';
+}
+
+/** Suggested 진도선 when both typed notes and ink are present: the later of the two. */
+export function mergeProgress(textProgress, inkProgress) {
+  return Math.max(textProgress || 0, inkProgress || 0);
+}
 
 /**
  * @param {{index:number,label:string,title:string,text:string}[]} slides
- * @param {{id:string,time:number|null,text:string,sentences:string[]}[]} chunks
+ * @param {{id:string,page:number|null,anchored:boolean,text:string,preview:boolean,para:number}[]} items — parseNotes(...).items
+ * @param {object} [ink] — { statuses: ('ink'|'light'|'none')[], ratios: number[], progress: number } already mapped to slide order (index-1)
  */
-export function analyzeCoverage(slides, chunks, options = {}) {
+export function analyzeNotes(slides, items, ink = null, options = {}) {
   const opt = { ...DEFAULTS, ...options };
   const n = slides.length;
   const slideFeat = slides.map((s) => features(s.text));
   const idf = idfOf(slideFeat);
   const slideVec = slideFeat.map((f) => tfidf(f, idf));
+  const posOf = new Map(slides.map((s, j) => [s.index, j]));
 
-  // Remove "다음 시간에 …" sentences from alignment; keep them as previews.
-  const previews = [];
-  const items = chunks.map((ch) => {
-    const kept = [];
-    for (const s of ch.sentences) {
-      if (isPreviewSentence(s)) previews.push({ chunkId: ch.id, sentence: s, time: ch.time ?? null });
-      else kept.push(s);
-    }
-    const alignText = kept.join(' ');
-    const vec = tfidf(features(alignText), idf);
+  const blocks = noteBlocks(items).map((b) => {
+    const vec = tfidf(features(b.text), idf);
     const sims = slideVec.map((sv) => cosine(vec, sv));
     const max = Math.max(0, ...sims);
-    return { chunk: ch, alignText, sims, max, offTopic: !alignText.trim() || max < opt.minSim };
+    const fixed = b.fixed != null && posOf.has(b.fixed) ? posOf.get(b.fixed) : null;
+    return { ...b, fixed, sims, max, offTopic: fixed == null && max < opt.minSim };
   });
 
-  // Viterbi over on-topic chunks.
-  const on = items.filter((it) => !it.offTopic);
+  const on = blocks.filter((b) => !b.offTopic);
   const path = viterbi(on, n, opt);
-  on.forEach((it, k) => {
-    it.slidePos = path[k];
-  });
-  // Off-topic chunks inherit the previous on-topic position (for emphasis pinning / timeline).
-  let last = on.length ? on[0].slidePos : 0;
-  for (const it of items) {
-    if (it.offTopic) it.slidePos = last;
-    else last = it.slidePos;
-  }
+  on.forEach((b, k) => (b.pos = path[k]));
 
-  // Aggregate per slide.
-  const per = slides.map((s, j) => ({
+  const per = slides.map((s) => ({
     index: s.index,
     label: s.label,
     title: s.title,
-    chunkIds: [],
+    noteIds: [],
     chars: 0,
     bestSim: 0,
+    anchored: 0,
+    counts: false, // has notes that may move the 진도선
+    textStatus: STATUS.NONE,
+    inkStatus: ink ? ink.statuses[s.index - 1] || STATUS.NONE : null,
+    inkRatio: ink ? ink.ratios[s.index - 1] ?? null : null,
     status: STATUS.NONE,
     emphasis: [],
   }));
-  for (const it of items) {
-    if (it.offTopic) continue;
-    const p = per[it.slidePos];
-    p.chunkIds.push(it.chunk.id);
-    p.chars += it.alignText.length;
-    p.bestSim = Math.max(p.bestSim, it.sims[it.slidePos]);
+  const pageOfNote = new Map();
+  for (const b of on) {
+    const p = per[b.pos];
+    for (const it of b.items) {
+      p.noteIds.push(it.id);
+      pageOfNote.set(it.id, p.index);
+      p.chars += it.text.length;
+    }
+    if (b.fixed != null) {
+      p.anchored += b.items.length;
+      p.counts = true;
+    } else {
+      p.bestSim = Math.max(p.bestSim, b.sims[b.pos]);
+      if (b.sims[b.pos] >= opt.alignMinSim) p.counts = true;
+    }
   }
-  const talked = per.filter((p) => p.chars > 0).map((p) => p.chars).sort((a, b) => a - b);
-  const median = talked.length ? talked[Math.floor((talked.length - 1) / 2)] : 0;
-  const coverChars = Math.max(opt.coverMinChars, median * opt.coverRatio);
   for (const p of per) {
-    if (p.chars >= coverChars && p.bestSim >= opt.coverMinSim) p.status = STATUS.COVERED;
-    else if (p.chars > 0) p.status = STATUS.BRIEF;
-  }
-  // Note: a "best match but assigned elsewhere" mention rule was tried and removed — summary slides
-  // (정리 표) and shared vocabulary made it flag untouched slides as 잠깐 언급.
-
-  // 진도선 = the last slide the lecture actually reached on its forward path (다룸 or 잠깐 언급).
-  // Using only 다룸 stopped the line early on every miss in the real-lecture eval: the last slides of a
-  // class are often talked through briefly (wrap-up, worked-example continuation) yet were taught.
-  // A 잠깐 언급 slide needs at least coverMinChars of talk to move the line, so one stray sentence
-  // that lands on the next slide (e.g. a single subtitle cue) does not.
-  let progress = 0;
-  for (const p of per) {
-    if (p.status === STATUS.COVERED || (p.status === STATUS.BRIEF && p.chars >= opt.coverMinChars)) progress = p.index;
+    if (p.chars > 0) p.textStatus = p.chars >= opt.fullChars ? STATUS.INK : STATUS.LIGHT;
+    p.status = maxStatus(p.textStatus, p.inkStatus);
   }
 
-  // Previews ("다음 시간에 …"): which upcoming slides were announced? Prefer the earliest strong match.
-  for (const p of previews) {
-    const vec = tfidf(features(p.sentence), idf);
-    const cands = slides
-      .map((s, j) => ({ index: s.index, sim: cosine(vec, slideVec[j]) }))
-      .filter((c) => c.index > progress && c.sim >= opt.minSim);
-    const best = Math.max(0, ...cands.map((c) => c.sim));
-    const strong = cands.filter((c) => c.sim >= best * 0.6);
-    p.slideIndices = strong.map((c) => c.index);
-    p.slideIndex = strong.length ? strong[0].index : null;
-  }
+  let textProgress = 0;
+  for (const p of per) if (p.counts) textProgress = p.index;
+  const inkProgress = ink ? ink.progress || 0 : 0;
+  const progress = mergeProgress(textProgress, inkProgress);
 
-  // Emphasis pinned to the slide being discussed at that moment.
-  const emphasis = detectEmphasis(chunks).map((e) => {
-    const it = items.find((x) => x.chunk.id === e.chunkId);
-    const slideIndex = slides[it.slidePos]?.index ?? null;
-    return { ...e, slideIndex };
-  });
+  // "다음 시간: …" lines: which upcoming slides were announced? Prefer the earliest strong match after the line.
+  const previews = items
+    .filter((it) => it.preview)
+    .map((it) => {
+      const vec = tfidf(features(it.text), idf);
+      const cands = slides
+        .map((s, j) => ({ index: s.index, sim: cosine(vec, slideVec[j]) }))
+        .filter((c) => c.index > progress && c.sim >= opt.minSim);
+      const best = Math.max(0, ...cands.map((c) => c.sim));
+      const strong = cands.filter((c) => c.sim >= best * 0.6);
+      return { noteId: it.id, text: it.text, slideIndices: strong.map((c) => c.index), slideIndex: strong.length ? strong[0].index : null };
+    });
+
+  // Emphasis pinned to the page its note line belongs to (null when the line matched no page).
+  const emphasis = detectEmphasis(items).map((e) => ({ ...e, slideIndex: pageOfNote.get(e.noteId) ?? null }));
   for (const e of emphasis) {
     const p = per.find((x) => x.index === e.slideIndex);
     if (p) p.emphasis.push(e);
   }
 
-  const timeline = items.map((it, k) => ({
-    chunkId: it.chunk.id,
-    time: it.chunk.time ?? null,
-    order: k,
-    chars: it.chunk.text.length,
-    slideIndex: slides[it.slidePos]?.index ?? null,
-    offTopic: it.offTopic,
-    sim: it.offTopic ? 0 : it.sims[it.slidePos],
-  }));
+  const unplaced = blocks.filter((b) => b.offTopic).flatMap((b) => b.items.map((it) => it.id));
 
-  return { slides: per, progress, emphasis, previews, timeline, coverChars };
+  return {
+    slides: per,
+    progress,
+    textProgress,
+    inkProgress,
+    emphasis,
+    previews,
+    unplaced,
+    pageOfNote: Object.fromEntries(pageOfNote),
+  };
 }
 
 function viterbi(items, n, opt) {
@@ -137,14 +140,17 @@ function viterbi(items, n, opt) {
   const T = items.length;
   const score = Array.from({ length: T }, () => new Float64Array(n));
   const back = Array.from({ length: T }, () => new Int32Array(n));
-  const emit = (it, j) => (it.max > 0 ? it.sims[j] / Math.max(it.max, opt.emitRef) : 0);
+  const emit = (it, j) => {
+    if (it.fixed != null) return j === it.fixed ? opt.fixedEmit : -opt.fixedEmit;
+    return it.max > 0 ? it.sims[j] / Math.max(it.max, opt.emitRef) : 0;
+  };
   const trans = (i, j) => {
     const d = j - i;
     if (d === 0) return 0;
     if (d > 0) return -opt.stepPenalty - opt.skipPenalty * (d - 1);
     return -opt.backPenalty - opt.skipPenalty * 0.5 * (-d - 1);
   };
-  for (let j = 0; j < n; j++) score[0][j] = emit(items[0], j) - opt.startPenalty * j;
+  for (let j = 0; j < n; j++) score[0][j] = emit(items[0], j) - (items[0].fixed != null ? 0 : opt.startPenalty * j);
   for (let t = 1; t < T; t++) {
     for (let j = 0; j < n; j++) {
       let best = -Infinity;
@@ -168,7 +174,7 @@ function viterbi(items, n, opt) {
   return path;
 }
 
-/** Split slides into covered (≤ progress) and upcoming (> progress) by slide index. */
+/** Split slides into taught (≤ progress) and upcoming (> progress) by slide index. */
 export function splitByProgress(slides, progress) {
   return {
     covered: slides.filter((s) => s.index <= progress),

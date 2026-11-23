@@ -4,7 +4,7 @@
 // Order matters: subscripted math identifiers (x_l, x_{i+1}, ε_a) before plain Latin words.
 const WORD_RE = /[a-zͰ-Ͽ]_\{?[a-z0-9+\-]+\}?|[가-힣]+|[a-z][a-z0-9]*|\d+(?:\.\d+)?|[Ͱ-Ͽ]+/g;
 
-// Very common spoken/written Hangul fragments that carry no topic signal.
+// Very common Hangul fragments (filler words, endings) that carry no topic signal.
 const STOP_HANGUL = new Set([
   '그래서', '그러니까', '이제', '여러분', '우리', '합니다', '있습니다', '거예요', '겁니다', '있어요',
   '이거', '그거', '저거', '이렇게', '그렇게', '하는', '하고', '해서', '하면', '그런데', '근데', '그리고',
@@ -101,41 +101,4 @@ export function bigramOverlap(needle, haystack) {
     hit += Math.min(c, b.get(g) || 0);
   }
   return hit / total;
-}
-
-/** Split Korean/English prose into sentences, keeping punctuation. */
-export function splitSentences(text) {
-  // Protect decimals (1.5214) and "p.3"-style references before splitting on periods.
-  const DOT = '․';
-  const t = normalizeText(text)
-    .replace(/[ \t]+/g, ' ')
-    .replace(/(\d)\.(?=\d)/g, '$1' + DOT)
-    .replace(/\b([a-zA-Z])\.(?=\s?\d)/g, '$1' + DOT);
-  const parts = [];
-  for (const line of t.split(/\n+/)) {
-    const pieces = line.match(/[^.?!。…]+(?:[.?!。…]+["'”’)]*|$)/g) || [];
-    for (const p of pieces) {
-      const s = p.trim();
-      if (s) parts.push(s.split(DOT).join('.'));
-    }
-  }
-  // Re-attach tiny fragments to the previous sentence.
-  const merged = [];
-  for (const s of parts) {
-    const prev = merged[merged.length - 1];
-    if (prev && s.length < 4) merged[merged.length - 1] = prev + ' ' + s;
-    else merged.push(s);
-  }
-  return merged;
-}
-
-export function formatTime(sec) {
-  if (sec == null || !Number.isFinite(sec)) return '';
-  const s = Math.max(0, Math.round(sec));
-  const h = Math.floor(s / 3600);
-  const m = Math.floor((s % 3600) / 60);
-  const r = s % 60;
-  const mm = String(m).padStart(2, '0');
-  const ss = String(r).padStart(2, '0');
-  return h ? `${h}:${mm}:${ss}` : `${mm}:${ss}`;
 }

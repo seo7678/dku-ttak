@@ -123,7 +123,7 @@ const KEY_ALIASES = {
   title: ['title', '제목'],
   coverage: ['coverage', '진도', '다룬정도'],
   summary: ['summary', '핵심정리', '핵심 정리', 'key_points', 'core'],
-  spoken: ['spoken', 'spoken_additions', '교수님이 말로 덧붙인 것', '교수님설명', 'verbal'],
+  notes: ['notes', 'from_notes', 'note', '필기', '내 필기', '필기에서', '필기 내용'],
   emphasis: ['emphasis', '강조', '강조 포인트', '강조포인트'],
   pitfalls: ['pitfalls', '헷갈리기 쉬운 점', '헷갈리는점', 'confusions'],
   questions: ['recall_questions', 'questions', '회상문제', '회상 질문', 'quiz'],
@@ -146,26 +146,38 @@ function pick(obj, key) {
 export function normalizeSource(src, refs = [], fallback = 'ai') {
   const s = String(src ?? '').toLowerCase().replace(/\s+/g, '');
   if (/^(교안|slide|슬라이드|ppt|자료)/.test(s)) return 'slide';
-  if (/^(수업|녹음|lecture|transcript|교수|강의|말)/.test(s)) return 'lecture';
+  if (/^(필기|내필기|노트|메모|판서|note|notes|ink|수업|강의)/.test(s)) return 'note';
   if (/^(ai|추정|보충|guess)/.test(s)) return 'ai';
-  if (refs.some((r) => /^T\d+/i.test(r))) return 'lecture';
-  if (refs.some((r) => /^P\d+/i.test(r))) return 'slide';
+  if (refs.some((r) => refType(r) === 'note')) return 'note';
+  if (refs.some((r) => refType(r) === 'slide')) return 'slide';
   return fallback;
+}
+
+/**
+ * Canonical ref key, or null when the id is not a ref: "p03" → "P3", "N12" → "n12",
+ * "ink-p5" / "ink5" / "INK-P05" → "ink-p5", "pan-p5" → "pan-p5" (교수님 판서본 page).
+ */
+export function refKey(id) {
+  const s = String(id ?? '').trim().replace(/^\[|\]$/g, '');
+  let m;
+  if ((m = s.match(/^(ink|pan)[-_ ]?p?(\d{1,4})$/i))) return `${m[1].toLowerCase()}-p${Number(m[2])}`;
+  if ((m = s.match(/^n(\d{1,5})$/i))) return 'n' + Number(m[1]);
+  if ((m = s.match(/^p\.?(\d{1,4})$/i))) return 'P' + Number(m[1]);
+  return null;
+}
+
+/** 'slide' for P-refs, 'note' for n / ink-p / pan-p refs. */
+export function refType(r) {
+  if (!r) return null;
+  if (r[0] === 'P') return 'slide';
+  if (r[0] === 'n' || r.startsWith('ink-') || r.startsWith('pan-')) return 'note';
+  return null;
 }
 
 function normRefs(r) {
   if (r == null) return [];
   const arr = Array.isArray(r) ? r : String(r).split(/[,\s]+/);
-  return arr
-    .map((x) => String(x).trim().toUpperCase().replace(/^\[|\]$/g, ''))
-    .filter((x) => /^[TP]\d+$/.test(x))
-    .map(refKey);
-}
-
-/** Canonical ref key: "T03" → "T3", "p12" → "P12". */
-export function refKey(id) {
-  const s = String(id).trim().toUpperCase();
-  return s[0] + String(parseInt(s.slice(1), 10));
+  return [...new Set(arr.map(refKey).filter(Boolean))];
 }
 
 function normStatement(item, sectionDefault) {
@@ -195,7 +207,7 @@ const QTYPES = ['예측', '개념', '계산'];
 
 /**
  * Normalize any reasonable reply object to:
- * { slides:[{slide,title,coverage,summary[],spoken[],emphasis[],pitfalls[]}], questions:[{slide,type,question,answer,refs}], course, week }
+ * { slides:[{slide,title,coverage,summary[],notes[],emphasis[],pitfalls[]}], questions:[{slide,type,question,answer,refs}], course, week }
  */
 export function normalizeGuide(raw) {
   if (!raw || typeof raw !== 'object') throw new ReplyError('JSON 형식이 해설지 형식이 아니에요.', '프롬프트의 스키마대로 다시 요청해 주세요.');
@@ -212,8 +224,8 @@ export function normalizeGuide(raw) {
       title: String(pick(s, 'title') ?? '').trim(),
       coverage: String(pick(s, 'coverage') ?? '').trim(),
       summary: normList(pick(s, 'summary'), 'slide'),
-      spoken: normList(pick(s, 'spoken'), 'lecture'),
-      emphasis: normList(pick(s, 'emphasis'), 'lecture'),
+      notes: normList(pick(s, 'notes'), 'note'),
+      emphasis: normList(pick(s, 'emphasis'), 'note'),
       pitfalls: normList(pick(s, 'pitfalls'), 'ai'),
     });
   }
