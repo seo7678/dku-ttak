@@ -86,8 +86,15 @@ export function analyzeCoverage(slides, chunks, options = {}) {
   // Note: a "best match but assigned elsewhere" mention rule was tried and removed — summary slides
   // (정리 표) and shared vocabulary made it flag untouched slides as 잠깐 언급.
 
+  // 진도선 = the last slide the lecture actually reached on its forward path (다룸 or 잠깐 언급).
+  // Using only 다룸 stopped the line early on every miss in the real-lecture eval: the last slides of a
+  // class are often talked through briefly (wrap-up, worked-example continuation) yet were taught.
+  // A 잠깐 언급 slide needs at least coverMinChars of talk to move the line, so one stray sentence
+  // that lands on the next slide (e.g. a single subtitle cue) does not.
   let progress = 0;
-  for (const p of per) if (p.status === STATUS.COVERED) progress = p.index;
+  for (const p of per) {
+    if (p.status === STATUS.COVERED || (p.status === STATUS.BRIEF && p.chars >= opt.coverMinChars)) progress = p.index;
+  }
 
   // Previews ("다음 시간에 …"): which upcoming slides were announced? Prefer the earliest strong match.
   for (const p of previews) {
