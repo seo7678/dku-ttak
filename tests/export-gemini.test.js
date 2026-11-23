@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { guideToMarkdown, buildSurveyResult } from '../js/lib/export.js';
-import { generateWithGemini, GeminiError, buildParts } from '../js/lib/gemini.js';
+import { generateWithGemini, GeminiError, buildParts, friendlyGeminiError, DEFAULT_MODEL, FALLBACK_MODELS, currentModel, shouldFallBack, generateWithFallback } from '../js/lib/gemini.js';
 import { buildPrompt, buildTranscribePrompt } from '../js/lib/prompt.js';
 import { analyzeLecture } from '../js/lib/pipeline.js';
 import { DEMO_SLIDES_TEXT, DEMO_NOTES } from '../js/data/demo-lecture.js';
@@ -138,9 +138,9 @@ test('gemini: builds the REST request and returns text', async () => {
     seen = { url, init };
     return { ok: true, status: 200, json: async () => ({ candidates: [{ content: { parts: [{ text: '{"slides":[]}' }] } }] }) };
   };
-  const out = await generateWithGemini({ apiKey: 'k-123', model: 'gemini-2.5-flash', prompt: 'P', fetchImpl });
+  const out = await generateWithGemini({ apiKey: 'k-123', model: 'gemini-3.5-flash', prompt: 'P', fetchImpl });
   assert.equal(out, '{"slides":[]}');
-  assert.match(seen.url, /models\/gemini-2\.5-flash:generateContent$/);
+  assert.match(seen.url, /models\/gemini-3\.5-flash:generateContent$/);
   assert.equal(seen.init.headers['x-goog-api-key'], 'k-123');
   assert.doesNotMatch(seen.url, /k-123/); // key never in the URL
   const body = JSON.parse(seen.init.body);
@@ -162,4 +162,76 @@ test('gemini: friendly errors', async () => {
     generateWithGemini({ apiKey: 'x', prompt: 'p', fetchImpl: async () => { throw new TypeError('fail'); } }),
     /네트워크/,
   );
+});
+
+const okRes = (t) => ({ ok: true, status: 200, json: async () => ({ candidates: [{ content: { parts: [{ text: t }] } }] }) });
+const errRes = (status) => ({ ok: false, status, json: async () => ({ error: { message: 'x' } }) });
+const modelOf = (url) => /models\/([^:]+):/.exec(url)[1];
+const hangUntilAbort = (url, init) => new Promise((_, rej) => init.signal.addEventListener('abort', () => rej(Object.assign(new Error('a'), { name: 'AbortError' }))));
+
+test('gemini: defaults and currentModel maps retired saved ids', () => {
+  assert.equal(DEFAULT_MODEL, 'gemini-3.5-flash');
+  assert.deepEqual(FALLBACK_MODELS, ['gemini-3.1-flash-lite', 'gemini-flash-latest']);
+  assert.equal(currentModel(''), DEFAULT_MODEL);
+  assert.equal(currentModel(null), DEFAULT_MODEL);
+  assert.equal(currentModel('gemini-2.5-flash'), DEFAULT_MODEL);
+  assert.equal(currentModel('gemini-1.5-pro'), DEFAULT_MODEL);
+  assert.equal(currentModel('gemini-3.1-flash-lite'), 'gemini-3.1-flash-lite');
+  assert.match(friendlyGeminiError(404, ''), /gemini-3\.5-flash/);
+});
+
+test('gemini: shouldFallBack only for 404, 5xx, timeout', () => {
+  for (const s of [404, 500, 503, -1]) assert.equal(shouldFallBack(new GeminiError('x', s)), true, String(s));
+  for (const s of [0, 400, 401, 403, 429]) assert.equal(shouldFallBack(new GeminiError('x', s)), false, String(s));
+  assert.equal(shouldFallBack(new Error('x')), false);
+});
+
+test('gemini: 404 falls back to the next model and reports which one answered', async () => {
+  const seen = [];
+  const tries = [];
+  const fetchImpl = async (url) => {
+    seen.push(modelOf(url));
+    return seen.length === 1 ? errRes(404) : okRes('{"ok":1}');
+  };
+  const r = await generateWithFallback({ apiKey: 'k', model: 'gemini-3.5-flash', prompt: 'P', fetchImpl, onTry: (id, i) => tries.push([id, i]) });
+  assert.deepEqual(r, { text: '{"ok":1}', model: 'gemini-3.1-flash-lite' });
+  assert.deepEqual(seen, ['gemini-3.5-flash', 'gemini-3.1-flash-lite']);
+  assert.deepEqual(tries, [['gemini-3.5-flash', 0], ['gemini-3.1-flash-lite', 1]]);
+});
+
+test('gemini: all failing throws the last error; a model equal to a fallback is not retried', async () => {
+  const seen = [];
+  const fetchImpl = async (url) => { seen.push(modelOf(url)); return errRes(503); };
+  await assert.rejects(generateWithFallback({ apiKey: 'k', model: 'gemini-3.1-flash-lite', prompt: 'P', fetchImpl }), (e) => e.status === 503);
+  assert.deepEqual(seen, ['gemini-3.1-flash-lite', 'gemini-flash-latest']);
+});
+
+test('gemini: 400/401 do not fall back', async () => {
+  for (const st of [400, 401]) {
+    let calls = 0;
+    const fetchImpl = async () => { calls++; return errRes(st); };
+    await assert.rejects(generateWithFallback({ apiKey: 'k', prompt: 'P', fetchImpl }), (e) => e instanceof GeminiError && e.status === st);
+    assert.equal(calls, 1);
+  }
+});
+
+test('gemini: a hung model times out per try and falls back', async () => {
+  const seen = [];
+  const fetchImpl = (url, init) => {
+    seen.push(modelOf(url));
+    return seen.length > 1 ? Promise.resolve(okRes('late')) : hangUntilAbort(url, init);
+  };
+  const r = await generateWithFallback({ apiKey: 'k', model: 'gemini-3.5-flash', prompt: 'P', fetchImpl, perTryMs: 30 });
+  assert.equal(r.model, 'gemini-3.1-flash-lite');
+  await assert.rejects(generateWithFallback({ apiKey: 'k', prompt: 'P', fetchImpl: hangUntilAbort, perTryMs: 20 }), (e) => e.status === -1 && /응답이 너무 늦어요/.test(e.message));
+});
+
+test('gemini: outer abort stops the chain', async () => {
+  const ctl = new AbortController();
+  let calls = 0;
+  const fetchImpl = (url, init) => { calls++; return hangUntilAbort(url, init); };
+  const p = generateWithFallback({ apiKey: 'k', prompt: 'P', fetchImpl, perTryMs: 5000, signal: ctl.signal });
+  setTimeout(() => ctl.abort(), 20);
+  await assert.rejects(p, (e) => e instanceof GeminiError && e.status === 0);
+  assert.equal(calls, 1);
 });

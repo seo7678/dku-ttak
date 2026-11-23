@@ -86,7 +86,7 @@
         <ol class="steps">
           <li><b>넣기.</b>교수님이 올려 주신 교안 PDF와 내 필기를 넣어요. 필기는 태블릿으로 교안에 적은 PDF(굿노트·노타빌리티·삼성노트에서 내보내기), 교수님 판서본(수업 뒤 교수님이 올려 주신 필기 포함 교안), 타이핑한 필기 모두 돼요. 종이 노트도 돼요: 사진을 찍어 평소 쓰는 AI 채팅에 보내고, 앱의 “필기 옮겨 적기” 프롬프트로 글자로 옮긴 뒤 붙여넣으면 돼요.</li>
           <li><b>진도 확인.</b>앱이 쪽마다 필기가 있는지 보고, 필기가 있는 마지막 쪽을 진도선으로 제안해요. 이 단계는 AI를 쓰지 않고 정해진 규칙으로 계산해요. 틀리면 선을 끌어서 옮기면 돼요.</li>
-          <li><b>복습 노트 · 퀴즈.</b>진도선 안쪽 교안과 필기만 담은 요청문(프롬프트)을 복사해 ChatGPT·Gemini·Claude에 붙여넣고, AI의 답을 다시 앱에 붙여넣으면 복습 노트가 돼요(무료). Gemini API 키가 있으면 버튼 한 번으로 만들 수도 있어요. 다 읽은 뒤에는 <strong>떠올리기 퀴즈</strong>로 복습해요. 정답을 보기 전에 내 답부터 쓰는 퀴즈예요.</li>
+          <li><b>복습 노트 · 퀴즈.</b>진도선 안쪽 교안과 필기만 담은 요청문(프롬프트)을 복사해 지금 쓰는 AI 채팅(ChatGPT·Gemini·Claude, ChatGPT Plus·Google AI Pro 같은 유료 구독 포함)에 붙여넣고, AI의 답을 다시 앱에 붙여넣으면 복습 노트가 돼요. 추가 비용은 없어요. Gemini API 키(Google AI Studio에서 따로 받는 키, 구독과는 별개)가 있으면 버튼 한 번으로 만들 수도 있어요. 다 읽은 뒤에는 <strong>떠올리기 퀴즈</strong>로 복습해요. 정답을 보기 전에 내 답부터 쓰는 퀴즈예요.</li>
         </ol>
       </div>
 
@@ -266,6 +266,7 @@
           <button type="button" role="tab" class="seg__btn" data-engine="paste" id="eng-paste" aria-controls="pane-paste">내 AI 채팅에 붙여넣기 <em>무료</em></button>
           <button type="button" role="tab" class="seg__btn" data-engine="gemini" id="eng-gemini" aria-controls="pane-gemini">Gemini API 키</button>
         </div>
+        <p class="hint" id="engine-both-hint">둘 다 돼요: 쓰고 있는 AI 채팅(유료 구독 포함)에 붙여넣거나, Gemini API 키로 바로 만들기.</p>
 
         <div class="pane" id="pane-demo" role="tabpanel" aria-labelledby="eng-demo" hidden>
           <p id="demo-pane-text">예시 수업이라 미리 만들어 둔 복습 노트를 바로 보여 드려요. (내 수업은 옆의 두 방법으로 만들어요.)</p>
@@ -273,6 +274,7 @@
         </div>
 
         <div class="pane" id="pane-paste" role="tabpanel" aria-labelledby="eng-paste" hidden>
+          <p class="hint">지금 쓰는 AI 채팅이면 어느 것이든 돼요. ChatGPT Plus, Google AI Pro의 Gemini, Claude 같은 유료 구독도 추가 비용 없이 그대로 쓸 수 있어요.</p>
           <ol class="paste-steps">
             <li>
               <div class="paste-steps__head"><b>프롬프트(AI에게 보낼 요청문) 복사</b> <span class="hint" id="prompt-meta"></span></div>
@@ -306,6 +308,7 @@
             <b>내 키로, 내 브라우저에서 바로 호출해요.</b> 키는 이 기기의 브라우저 저장소(localStorage)에만 저장할 수 있고, 이 사이트 서버는 없어요. 진도선 안쪽 교안·필기<span id="gemini-ink-note"></span>가 Google Gemini로 전송되고 Google 약관이 적용돼요. 공용 PC라면 저장하지 마세요.
             <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio에서 키 받기</a>
           </div>
+          <p class="hint">버튼 한 번으로 노트를 만들어요. 키는 Google AI Studio에서 따로 받아요(구독과는 별개예요).</p>
           <div class="grid-2">
             <div class="field">
               <label for="gemini-key">Gemini API 키</label>
@@ -317,8 +320,8 @@
             </div>
             <div class="field">
               <label for="gemini-model">모델 ID</label>
-              <input id="gemini-model" type="text" spellcheck="false" value="gemini-2.5-flash" />
-              <p class="hint">바꿔 쓸 수 있어요. 예: gemini-2.5-flash, gemini-2.5-pro</p>
+              <input id="gemini-model" type="text" spellcheck="false" value="gemini-3.5-flash" />
+              <p class="hint">바꿔 쓸 수 있어요. 예: gemini-3.5-flash, gemini-3.1-flash-lite. 이 모델이 응답하지 않으면 다른 모델로 자동으로 다시 시도해요.</p>
             </div>
           </div>
           <div class="actions">

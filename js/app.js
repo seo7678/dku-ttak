@@ -8,7 +8,7 @@ import { cueLabel } from './lib/emphasis.js';
 import { buildPrompt, buildTranscribePrompt, INK_KIND } from './lib/prompt.js';
 import { parseReply, normalizeGuide, ReplyError, refType } from './lib/reply.js';
 import { verifyGuide, noteOrigin, NOTE_ORIGIN } from './lib/verify.js';
-import { generateWithGemini, DEFAULT_MODEL } from './lib/gemini.js';
+import { generateWithFallback, currentModel, DEFAULT_MODEL } from './lib/gemini.js';
 import { inkRatio, pageInk, suggestProgress } from './lib/ink.js';
 import { saveWeek, getCarryOver, mergeCarryOver, loadCourses, memoryStorage, courseKey } from './lib/weeks.js';
 import { guideToMarkdown, SURVEY_ITEMS, BASELINE_ITEMS, PROGRESS_OFF_OPTIONS, buildSurveyResult } from './lib/export.js';
@@ -790,7 +790,7 @@ async function runGeminiEngine() {
   const status = $('#gemini-status');
   btn.disabled = true;
   geminiAbort = new AbortController();
-  const timer = setTimeout(() => geminiAbort.abort(), 180000);
+  const timer = setTimeout(() => geminiAbort.abort(), 300000);
   try {
     if (!key) throw new ReplyError('Gemini API 키를 먼저 넣어 주세요.', '');
     refreshGenerate();
@@ -806,12 +806,14 @@ async function runGeminiEngine() {
         return { label: `${prefix}-p${idx} (교안 ${idx}쪽에 ${S.inkKind === 'pan' ? '교수님이 판서한' : '내가 필기한'} 페이지)`, mimeType: im.mimeType, data: im.data };
       });
     }
-    status.textContent = `${model}로 만드는 중… 보통 20–60초 걸려요`;
-    const text = await generateWithGemini({ apiKey: key, model, prompt: S.prompt.text, images, signal: geminiAbort.signal });
+    const onTry = (id, i) => {
+      status.textContent = i === 0 ? `${id}로 만드는 중… 보통 20–60초 걸려요` : `${model}이 응답하지 않아 ${id}로 다시 시도하는 중…`;
+    };
+    const { text, model: used } = await generateWithFallback({ apiKey: key, model, prompt: S.prompt.text, images, signal: geminiAbort.signal, onTry });
     status.textContent = '받았어요. 근거를 대조하는 중…';
     const guide = parseReply(text);
     status.textContent = '';
-    finalizeGuide(guide, `Gemini API (${model})`);
+    finalizeGuide(guide, `Gemini API (${used})`);
   } catch (e) {
     status.textContent = '';
     showBoxError('#gemini-error', e);
@@ -1475,7 +1477,7 @@ function bind() {
     $('#gemini-key').value = savedKey;
     $('#gemini-remember').checked = true;
   }
-  $('#gemini-model').value = store.get(KEYS.gemModel) || DEFAULT_MODEL;
+  $('#gemini-model').value = currentModel(store.get(KEYS.gemModel));
   $('#gemini-key-toggle').addEventListener('click', (e) => {
     const inp = $('#gemini-key');
     const show = inp.type === 'password';
