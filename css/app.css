@@ -255,6 +255,8 @@ main:focus, main:focus-visible { outline: none; }
 .steps b { margin-right: 6px; }
 .prose-band { max-width: 46em; color: var(--text); margin: 0; }
 .prose-band b { font-weight: 800; }
+.maker { max-width: 46em; color: var(--muted); margin: 16px 0 0; }
+.hero__visual .legend { margin-top: 10px; }
 
 /* ---------- carry-over notice ---------- */
 .carry { border-radius: var(--radius); background: var(--bg); border: 1px solid var(--text); padding: 14px 16px; margin: 0 0 18px; display: grid; gap: 8px; }
@@ -386,6 +388,9 @@ main:focus, main:focus-visible { outline: none; }
 .verify__note { font-size: 0.9rem; color: var(--muted); flex-basis: 100%; }
 .warn-list { margin: 0; padding: 10px 14px 10px 30px; border: 1px solid var(--text); border-radius: var(--radius-sm); font-size: 0.95rem; color: var(--text); }
 .toolbar { display: flex; flex-wrap: wrap; gap: 8px; }
+.toolbar .hint { align-self: center; margin: 0; }
+.verify__codes { flex-basis: 100%; font-size: 0.9rem; color: var(--muted); }
+.verify__codes summary { cursor: pointer; color: var(--text); }
 .measure { width: fit-content; justify-self: start; display: inline-flex; align-items: center; gap: 6px; font-size: 0.92rem; font-weight: 700; color: var(--text); border: 1px solid var(--line-2); border-radius: 3px; padding: 3px 10px; }
 
 .scard { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: clamp(16px, 3vw, 24px); margin-bottom: 14px; break-inside: avoid; }

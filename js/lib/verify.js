@@ -150,7 +150,7 @@ export function verifyGuide(guide, ctx) {
 
   const questions = guide.questions.filter((q) => q.slide == null || q.slide <= ctx.progress);
   const droppedQ = guide.questions.length - questions.length;
-  if (droppedQ) warnings.push(`진도선 밖 회상 문제 ${droppedQ}개를 뺐어요.`);
+  if (droppedQ) warnings.push(`진도선 밖 퀴즈 문제 ${droppedQ}개를 뺐어요.`);
   for (const q of questions) q.refs = (q.refs || []).filter(isValid);
 
   const nextPreview = ctx.slides.filter((s) => s.index > ctx.progress).map((s) => ({ slide: s.index, title: s.title }));

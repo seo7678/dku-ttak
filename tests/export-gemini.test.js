@@ -74,12 +74,12 @@ test('markdown export: 교안 / 필기 / AI 보충 tags and note evidence with o
     questions: [{ slide: 3, type: '예측', question: 'Q?', answer: 'A' }],
     nextPreview: [{ slide: 9, title: '뉴턴-랩슨법의 수렴' }],
   });
-  assert.match(md, /^# 공학수치해석 3주차 해설지/);
+  assert.match(md, /^# 공학수치해석 3주차 복습 노트/);
   assert.match(md, /- \[교안\] 중간값 정리 \(근거: P3\)/);
   assert.match(md, /- \[필기\] 그래프 먼저 \(근거: n10\)/);
   assert.match(md, /- \[AI 보충\] 보충 설명/);
   assert.match(md, /“★중요”/);
-  assert.match(md, /\*\*필기에서 \(교안에 없는 것\)\*\*/);
+  assert.match(md, /\*\*내 필기에만 있는 것 \(교안에 없음\)\*\*/);
   assert.match(md, /<summary>필기 근거<\/summary>/);
   assert.match(md, /- n8 \(내 필기\): 중간값 정리/);
   assert.match(md, /- pan-p3 \(교수님 판서\): /);
@@ -107,7 +107,7 @@ test('survey result v3: notes-based questions, 진도선 accuracy, baseline + au
   assert.match(r.text, /●●●●● 5\/5/);
   assert.match(r.text, /5\. 제안된 진도선: 1쪽 차이/);
   assert.match(r.text, /교안 \+ 필기로 복습 자료 만드는 데 걸리던 시간: 90분/);
-  assert.match(r.text, /입력 시작 → 해설지: 2분 30초/);
+  assert.match(r.text, /입력 시작 → 복습 노트: 2분 30초/);
   assert.match(r.text, /첫 시도 60% → 다시 풀기 후 90% \(10문항\)/);
   assert.match(r.text, /전체 12쪽 중 제안 8쪽 → 최종 9쪽 \(직접 \+1쪽 조정\)/);
   assert.match(r.text, /교수님 판서본 PDF/);

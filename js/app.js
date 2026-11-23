@@ -77,8 +77,8 @@ function route() {
     if (a.dataset.nav === v) a.setAttribute('aria-current', 'page');
     else a.removeAttribute('aria-current');
   }
-  const titles = { home: '', make: '만들기', guide: '해설지', quiz: '회상 퀴즈', survey: '사용 후기', about: '소개' };
-  document.title = (titles[v] ? titles[v] + ' · ' : '') + '딱 거기까지 — 오늘 수업이 끝난 데까지만 만드는 AI 해설지';
+  const titles = { home: '', make: '만들기', guide: '복습 노트', quiz: '떠올리기 퀴즈', survey: '사용 후기', about: '소개' };
+  document.title = (titles[v] ? titles[v] + ' · ' : '') + '딱 거기까지 — 오늘 배운 데까지만 만드는 AI 복습 노트';
   if (v === 'guide') renderGuide();
   if (v === 'quiz') renderQuiz();
   if (v === 'survey') renderSurvey();
@@ -436,7 +436,7 @@ function renderPreviewCallout() {
       '“',
       p.text,
       '”',
-      h('div.small', '이런 줄은 진도선을 옮기지 않아요.'),
+      h('div.small', '“다음 시간에 할 것” 같은 예고는 배운 내용이 아니라서 진도선을 옮기지 않아요.'),
       next ? h('div', `→ 다음 수업은 ${slideLabel(next)}쪽 「${next.title}」부터`) : null,
     ),
   );
@@ -584,7 +584,7 @@ function covEndText(a, s) {
   const carried = a.slides.filter((x) => x.carriedFrom).length;
   if (!s) return '';
   const where = s.carriedFrom ? `지난주 교안 ${s.label}쪽` : carried ? `이번 주 교안 ${s.label}쪽` : `${s.label}쪽`;
-  return `${where} 「${s.title ?? ''}」까지 수업한 것으로 해설지를 만들어요${carried ? ` · 지난주 남은 ${carried}쪽 포함` : ''}`;
+  return `${where} 「${s.title ?? ''}」까지 수업한 것으로 복습 노트를 만들어요${carried ? ` · 지난주 남은 ${carried}쪽 포함` : ''}`;
 }
 
 /** "제안: 8쪽 — 마지막 필기 쪽" / "판서가 있는 마지막 쪽 8쪽" (판서본) / both sources → the later one. */
@@ -625,9 +625,9 @@ function renderCovSummary() {
     h('div.cov-text', h('p.cov-suggest', suggestionText(a)), S.progress ? h('p', covEndText(a, s)) : null),
     h(
       'div.cov-chips',
-      h('span.c-ink', `필기 있음 ${count(STATUS.INK)}`),
-      h('span.c-light', `필기 조금 ${count(STATUS.LIGHT)}`),
-      h('span', `필기 없음 ${count(STATUS.NONE)}`),
+      h('span.c-ink', `필기 있음 ${count(STATUS.INK)}쪽`),
+      h('span.c-light', { title: '필기가 짧게 있는 쪽 — 배운 쪽으로 셈' }, `필기 조금 ${count(STATUS.LIGHT)}쪽`),
+      h('span', `필기 없음 ${count(STATUS.NONE)}쪽`),
       gaps ? h('span.c-gap', `진도선 안 필기 없는 쪽 ${gaps} · 교안으로 설명`) : null,
       h('span.c-em', `★ 강조 ${cov.emphasis.length}곳`),
       S.progress !== S.autoProgress ? h('span.c-manual', `직접 조정 (제안: ${S.autoProgress}쪽)`) : null,
@@ -727,8 +727,8 @@ function refreshGenerate() {
   demoBtn.title = S.isDemo ? '' : '예시 수업을 넣었을 때만 쓸 수 있어요';
   $('#demo-pane-text').textContent = S.isDemo
     ? S.progress === S.autoProgress
-      ? '예시 수업이라 미리 만들어 둔 해설지를 바로 보여 드려요. (실제 수업에서는 옆의 두 방법으로 만들어요.)'
-      : `미리 만든 예시 해설지는 진도선 ${S.autoProgress}쪽 기준이에요. 지금 진도선(${S.progress}쪽)에 맞춰 밖의 쪽은 빼고 보여 드려요.`
+      ? '예시 수업이라 미리 만들어 둔 복습 노트를 바로 보여 드려요. (내 수업은 옆의 두 방법으로 만들어요.)'
+      : `미리 만든 예시 복습 노트는 진도선 ${S.autoProgress}쪽 기준이에요. 지금 진도선(${S.progress}쪽)에 맞춰 밖의 쪽은 빼고 보여 드려요.`
     : '예시 결과는 “예시 수업 채우기”로 넣은 예시에서만 쓸 수 있어요.';
 }
 
@@ -761,11 +761,11 @@ function showBoxError(sel, err) {
 async function runDemoEngine() {
   try {
     const res = await fetch('data/demo-guide.json');
-    if (!res.ok) throw new Error(`예시 해설지를 불러오지 못했어요 (${res.status})`);
+    if (!res.ok) throw new Error(`예시 복습 노트를 불러오지 못했어요 (${res.status})`);
     const guide = normalizeGuide(await res.json());
     finalizeGuide(guide, '예시 (미리 만든 결과)');
   } catch (e) {
-    toast(e.message || '예시 해설지를 불러오지 못했어요');
+    toast(e.message || '예시 복습 노트를 불러오지 못했어요');
   }
 }
 
@@ -912,22 +912,23 @@ function renderGuide() {
   const st = doc.stats;
   const head = h(
     'header.guide-head',
-    h('div.guide-head__top', h('h1#guide-title.view__title', `${doc.course} ${doc.week}주차 해설지`), doc.demo ? h('span.pill.pill--demo', '예시 · 창작 데이터') : null),
+    h('div.guide-head__top', h('h1#guide-title.view__title', `${doc.course} ${doc.week}주차 복습 노트`), doc.demo ? h('span.pill.pill--demo', '예시 · 창작 데이터') : null),
     h(
       'div.guide-meta',
-      h('span', h('b', `${lab(doc, first?.slide ?? 1)}–${lab(doc, doc.progress)}쪽`), ` 해설 (전체 ${doc.total}쪽 중, `, h('b.acc', `진도선 ${lab(doc, doc.progress)}쪽`), ')'),
+      h('span', h('b', `${lab(doc, first?.slide ?? 1)}–${lab(doc, doc.progress)}쪽`), ` 정리 (전체 ${doc.total}쪽 중 · `, h('b.acc', `진도선 ${lab(doc, doc.progress)}쪽`), ' = 이 수업이 끝난 쪽)'),
       h('span', `만든 방법: ${doc.engine}`),
-      doc.toGuideMs != null ? h('span.measure', { title: '입력을 시작한 때부터 해설지가 나올 때까지, 이 브라우저가 잰 시간' }, `⏱ 해설지까지 ${formatDuration(doc.toGuideMs)}`) : null,
+      doc.toGuideMs != null ? h('span.measure', { title: '입력을 시작한 때부터 복습 노트가 나올 때까지, 이 브라우저가 잰 시간' }, `⏱ ${formatDuration(doc.toGuideMs)} · 입력 시작부터 노트가 나오기까지 잰 시간`) : null,
     ),
     h(
       'div.toolbar.no-print',
-      h('a.btn.btn--primary', { href: '#/quiz' }, `회상 퀴즈 시작 (${doc.questions.length}문제)`),
+      h('a.btn.btn--primary', { href: '#/quiz', title: '정답을 보기 전에 내 답부터 쓰는 퀴즈' }, `떠올리기 퀴즈 시작 (${doc.questions.length}문제)`),
       h('button.btn', { type: 'button', onClick: () => printGuide() }, '인쇄 · PDF로 저장'),
-      h('button.btn', { type: 'button', onClick: () => downloadMd() }, 'Markdown 저장'),
+      h('button.btn', { type: 'button', onClick: () => downloadMd() }, 'Markdown(텍스트) 저장'),
+      h('span.hint', '떠올리기 퀴즈: 정답을 보기 전에 내 답부터 쓰는 퀴즈예요'),
     ),
     h(
       'div.verify',
-      h('span.verify__label', '출처'),
+      h('span.verify__label', '출처별 문장 수'),
       ...['slide', 'note', 'ai'].map((k) =>
         h(
           'button',
@@ -941,20 +942,29 @@ function renderGuide() {
               renderGuide();
             },
           },
-          `${SRC_TAG[k]} ${st[k] ?? 0}`,
+          `${SRC_TAG[k]} ${st[k] ?? 0}문장`,
         ),
       ),
       h(
-        'span.verify__note',
-        '필기 근거: ',
+        'p.verify__note',
+        h('b', '교안'),
+        ' = 교수님 교안에 있는 내용 · ',
+        h('b', '필기'),
+        ' = 내 필기나 교수님 판서에서 온 내용 · ',
+        h('b', 'AI 보충'),
+        ' = 교안·필기에 없는데 AI가 덧붙인 설명이라, 교재로 확인하세요. 문장 끝 번호는 근거 위치(교안 쪽·내 필기 줄)예요. AI가 “필기”라고 단 문장에 실제 필기 근거가 없으면 앱이 AI 보충으로 바꿔 표시해요. 위 버튼을 누르면 그 출처 문장을 숨기거나 다시 보여요.',
+      ),
+      h(
+        'details.verify__codes',
+        h('summary', '근거 번호 읽는 법'),
         h('span.ref', 'n··'),
-        ' 내 필기(타이핑) 줄 · ',
+        ' 타이핑 필기 몇 번째 줄 · ',
         h('span.ref.ref--ink', 'ink-p··'),
-        ' 내가 필기한 교안 쪽 · ',
+        ' 내가 필기한 교안 몇 쪽 · ',
         h('span.ref.ref--ink', 'pan-p··'),
-        ' 교수님 판서본 쪽 · ',
+        ' 교수님 판서본 몇 쪽 · ',
         h('span.ref.ref--p', 'P··'),
-        ' 교안 쪽. 브라우저가 실제 입력과 다시 대조해서, 필기 근거가 없는 “필기” 문장은 AI 보충으로 내립니다.',
+        ' 교안 몇 쪽',
       ),
     ),
     doc.warnings?.length ? h('ul.warn-list', doc.warnings.map((w) => h('li', w))) : null,
@@ -986,7 +996,7 @@ function renderGuide() {
       card.append(h('section.sec', h('h3.sec__title', title), h('ul.stmts', arr.map(stmtEl))));
     };
     sec('핵심 정리', s.summary);
-    sec('필기에서 — 교안에 없는 것', s.notes);
+    sec('내 필기에만 있는 것 (교안에 없음)', s.notes);
     sec('강조 포인트', s.emphasis);
     sec('헷갈리기 쉬운 점', s.pitfalls);
     if (s.evidence?.length) {
@@ -1004,7 +1014,7 @@ function renderGuide() {
   const next = h(
     'section.next-card',
     h('h2', '다음 수업 예고'),
-    doc.nextPreview.length ? h('p.small', '아직 안 배운 쪽이라 해설을 만들지 않았어요. 제목만 미리 봐 두세요.') : h('p.small', '교안을 끝까지 나갔어요.'),
+    doc.nextPreview.length ? h('p.small', '아직 안 배운 쪽이라 노트를 만들지 않았어요. 제목만 미리 봐 두세요.') : h('p.small', '교안을 끝까지 나갔어요.'),
     doc.nextPreview.length ? h('ol', doc.nextPreview.map((p) => h('li', h('b', `${lab(doc, p.slide)}쪽`), p.title))) : null,
     h('div.actions.no-print', h('button.btn.btn--primary', { type: 'button', onClick: () => startNextWeek() }, `${doc.week + 1}주차 이어서 만들기 →`), h('a.btn.btn--ghost', { href: '#/survey' }, '사용 후기 남기기')),
   );
@@ -1026,9 +1036,9 @@ function printGuide() {
 function downloadMd() {
   const d = S.doc;
   const md = guideToMarkdown({ ...d, labels: new Map(Object.entries(d.labels).map(([k, v]) => [Number(k), v])) });
-  const safe = `${d.course}-${d.week}주차-해설지`.replace(/[\\/:*?"<>|\s]+/g, '_');
+  const safe = `${d.course}-${d.week}주차-복습노트`.replace(/[\\/:*?"<>|\s]+/g, '_');
   download(`${safe}.md`, md);
-  toast('Markdown 파일을 저장했어요');
+  toast('Markdown(텍스트) 파일을 저장했어요');
 }
 
 function startNextWeek() {
@@ -1063,7 +1073,7 @@ function renderQuiz() {
   root.append(wrap);
   if (!doc || !doc.questions?.length) {
     wrap.append(
-      h('div.empty', h('h1#quiz-title.view__title', '회상 퀴즈'), h('p', doc ? '이 해설지에는 회상 문제가 없어요.' : '먼저 해설지를 만들어 주세요.'), h('div.actions', h('button.btn.btn--primary', { type: 'button', onClick: () => demoGuideFlow() }, '예시로 해 보기'), h('a.btn.btn--ghost', { href: '#/make' }, '만들기'))),
+      h('div.empty', h('h1#quiz-title.view__title', '떠올리기 퀴즈'), h('p', doc ? '이 복습 노트에는 퀴즈 문제가 없어요.' : '먼저 복습 노트를 만들어 주세요.'), h('div.actions', h('button.btn.btn--primary', { type: 'button', onClick: () => demoGuideFlow() }, '예시로 해 보기'), h('a.btn.btn--ghost', { href: '#/make' }, '만들기'))),
     );
     return;
   }
@@ -1072,8 +1082,8 @@ function renderQuiz() {
     const types = {};
     doc.questions.forEach((x) => (types[x.type] = (types[x.type] || 0) + 1));
     wrap.append(
-      h('h1#quiz-title.view__title', '회상 퀴즈'),
-      h('p.view__lead', '정답을 보기 전에 ', h('b', '내 답을 먼저 써요'), '. ○ △ ✕로 스스로 채점하면, 틀리거나 애매한 문제는 끝에 다시 나와요. 첫 시도 점수와 다시 푼 뒤 점수를 둘 다 보여 드려요.'),
+      h('h1#quiz-title.view__title', '떠올리기 퀴즈'),
+      h('p.view__lead', '정답을 보기 전에 ', h('b', '내 답부터 쓰는 퀴즈'), '예요. ○ △ ✕로 스스로 채점하면, 틀리거나 애매한 문제는 끝에 다시 나와요. 첫 시도 점수와 다시 푼 뒤 점수를 둘 다 보여 드려요.'),
       h('div.qcard', h('p', `${doc.course} ${doc.week}주차 · ${lab(doc, doc.slides[0].slide)}–${lab(doc, doc.progress)}쪽 · ${doc.questions.length}문제`), h('div.qcard__meta', Object.entries(types).map(([t, c]) => h('span', { class: ['qtype', `qtype--${t}`] }, `${t} ${c}`))), h('div.actions', h('button.btn.btn--primary.btn--lg', { type: 'button', onClick: startQuiz }, '시작하기'))),
     );
     return;
@@ -1097,7 +1107,7 @@ function renderQuestion(wrap) {
   const done = q.pos;
   const total = q.queue.length;
   wrap.append(
-    h('div.quiz__top', h('h1#quiz-title.view__title', q.round === 1 ? '회상 퀴즈' : `다시 풀기 · ${q.round - 1}회차`), h('span.small', `문제 ${done + 1} / ${total}`)),
+    h('div.quiz__top', h('h1#quiz-title.view__title', q.round === 1 ? '떠올리기 퀴즈' : `다시 풀기 · ${q.round - 1}회차`), h('span.small', `문제 ${done + 1} / ${total}`)),
     h('div.quiz__progress', { role: 'progressbar', 'aria-valuemin': '0', 'aria-valuemax': String(total), 'aria-valuenow': String(done), 'aria-label': '진행' }, h('i', { style: { '--p': `${(done / total) * 100}%` } })),
   );
   const card = h('div.qcard');
@@ -1185,9 +1195,9 @@ function renderQuizResult(wrap) {
       h('div.scorebars', bar('첫 시도', sum.first.percent, 'scorebar--first'), bar('다시 푼 뒤', sum.after.percent, 'scorebar--after')),
       h('p', `첫 시도 ○ ${sum.first.o} · △ ${sum.first.t} · ✕ ${sum.first.x} → 다시 푼 뒤 ○ ${sum.after.o} · △ ${sum.after.t} · ✕ ${sum.after.x}  (${sum.total}문제, ${sum.rounds}회차)`),
       qr?.quizMs != null ? h('p.measure', `⏱ 퀴즈 ${formatDuration(qr.quizMs)}`) : null,
-      sum.weak.length ? h('div', h('h2.sec__title', '처음에 막혔던 문제 — 해설지에서 다시 보기'), h('ul.weak', sum.weak.map((w) => h('li', h('span.marks', `${Q.MARK_LABEL[w.first]}→${Q.MARK_LABEL[w.last] || '·'}`), w.slide ? h('a', { href: '#/guide', onClick: () => setTimeout(() => $(`#s-${w.slide}`)?.scrollIntoView(), 50) }, `${lab(doc, w.slide)}쪽`) : null, h('span', w.question))))) : h('p', '처음부터 모두 ○ — 잘했어요!'),
+      sum.weak.length ? h('div', h('h2.sec__title', '처음에 막혔던 문제 — 복습 노트에서 다시 보기'), h('ul.weak', sum.weak.map((w) => h('li', h('span.marks', `${Q.MARK_LABEL[w.first]}→${Q.MARK_LABEL[w.last] || '·'}`), w.slide ? h('a', { href: '#/guide', onClick: () => setTimeout(() => $(`#s-${w.slide}`)?.scrollIntoView(), 50) }, `${lab(doc, w.slide)}쪽`) : null, h('span', w.question))))) : h('p', '처음부터 모두 ○ — 잘했어요!'),
       h('p.small', '점수는 스스로 채점한 결과예요.'),
-      h('div.actions', h('a.btn.btn--primary', { href: '#/survey' }, '사용 후기 남기기'), h('a.btn', { href: '#/guide' }, '해설지로'), h('button.btn.btn--ghost', { type: 'button', onClick: () => { S.quiz = null; store.remove(KEYS.quiz); renderQuiz(); } }, '처음부터 다시')),
+      h('div.actions', h('a.btn.btn--primary', { href: '#/survey' }, '사용 후기 남기기'), h('a.btn', { href: '#/guide' }, '복습 노트로'), h('button.btn.btn--ghost', { type: 'button', onClick: () => { S.quiz = null; store.remove(KEYS.quiz); renderQuiz(); } }, '처음부터 다시')),
     ),
   );
 }
@@ -1261,8 +1271,8 @@ function renderSurvey() {
     h('b', '함께 보내는 자동 측정값 (이 브라우저가 잰 값, 개인정보 없음)'),
     h(
       'ul',
-      h('li', `입력 시작 → 해설지: ${m.toGuideMs != null ? formatDuration(m.toGuideMs) : '아직 측정 안 됨'}`),
-      h('li', `회상 퀴즈: 첫 시도 ${pct(m.quizFirstPct)} → 다시 푼 뒤 ${pct(m.quizAfterPct)}`),
+      h('li', `입력 시작 → 복습 노트: ${m.toGuideMs != null ? formatDuration(m.toGuideMs) : '아직 측정 안 됨'}`),
+      h('li', `떠올리기 퀴즈: 첫 시도 ${pct(m.quizFirstPct)} → 다시 푼 뒤 ${pct(m.quizAfterPct)}`),
       h('li', `진도선: ${m.slides ?? '—'}쪽 중 제안 ${m.suggested ?? '—'}쪽 → 최종 ${m.progress ?? '—'}쪽${adj ? ` (직접 ${adj > 0 ? '+' : ''}${adj}쪽)` : ''}`),
       h('li', `필기: 필기 있음 ${m.noted ?? '—'}쪽 · 강조 ${m.emphasis ?? '—'}곳 · 엔진 ${m.engine ?? '—'}${m.demo ? ' (예시 데이터)' : ''}`),
     ),

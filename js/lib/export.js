@@ -18,9 +18,9 @@ function line(st) {
 export function guideToMarkdown(doc) {
   const L = [];
   const lab = (n) => doc.labels?.get?.(n) ?? String(n);
-  L.push(`# ${doc.course || '강의'} ${doc.week ? doc.week + '주차' : ''} 해설지`.trim());
+  L.push(`# ${doc.course || '강의'} ${doc.week ? doc.week + '주차' : ''} 복습 노트`.trim());
   L.push('');
-  L.push(`> 딱 거기까지 — 오늘 수업이 실제로 끝난 **${lab(doc.progress)}쪽**까지만 만든 해설지 (전체 ${doc.total}쪽)  `);
+  L.push(`> 딱 거기까지 — 오늘 수업이 실제로 끝난 **${lab(doc.progress)}쪽**까지만 만든 복습 노트 (전체 ${doc.total}쪽)  `);
   L.push(`> 생성: ${doc.engine || ''} · ${doc.createdAt ? doc.createdAt.slice(0, 10) : ''}  `);
   L.push('> 출처 표시: [교안] 슬라이드 글 · [필기] 내 필기 또는 교수님 판서 (근거 n··· = 타이핑 필기 줄, ink-p··· = 필기한 교안 쪽, pan-p··· = 판서본 쪽) · [AI 보충] 교안·필기에 없는 AI 설명(확인 필요)');
   L.push('');
@@ -34,7 +34,7 @@ export function guideToMarkdown(doc) {
       arr.forEach((st) => L.push(line(st)));
     };
     sec('핵심 정리', s.summary);
-    sec('필기에서 (교안에 없는 것)', s.notes);
+    sec('내 필기에만 있는 것 (교안에 없음)', s.notes);
     sec('강조 포인트', s.emphasis);
     sec('헷갈리기 쉬운 점', s.pitfalls);
     if (s.evidence?.length) {
@@ -48,7 +48,7 @@ export function guideToMarkdown(doc) {
     L.push('');
   }
   if (doc.questions?.length) {
-    L.push('## 회상 퀴즈 (답을 가리고 먼저 떠올려 보세요)');
+    L.push('## 떠올리기 퀴즈 (답을 가리고 먼저 떠올려 보세요)');
     L.push('');
     doc.questions.forEach((q, i) => {
       L.push(`${i + 1}. [${q.type}${q.slide ? ` · ${lab(q.slide)}쪽` : ''}] ${q.question}`);
@@ -66,9 +66,9 @@ export function guideToMarkdown(doc) {
 }
 
 export const SURVEY_ITEMS = [
-  { key: 'usefulness', label: '해설지가 복습에 쓸모 있었나요?' },
+  { key: 'usefulness', label: '복습 노트가 공부에 쓸모 있었나요?' },
   { key: 'tags', label: '문장마다 붙은 교안 · 필기 · AI 보충 표시가 도움이 됐나요?' },
-  { key: 'quiz', label: '회상 퀴즈가 기억을 떠올리는 데 도움이 됐나요?' },
+  { key: 'quiz', label: '떠올리기 퀴즈가 기억을 떠올리는 데 도움이 됐나요?' },
   { key: 'reuse', label: '다음 주 수업에도 다시 쓸 생각이 있나요?' },
 ];
 
@@ -82,7 +82,7 @@ export const PROGRESS_OFF_OPTIONS = [
 
 // Before/after baseline asked of the user (self-report), next to what the app measured itself.
 export const BASELINE_ITEMS = {
-  minutes: '평소 교안 + 필기로 복습 자료(해설지)를 만드는 데 걸리는 시간 (분)',
+  minutes: '평소 교안 + 필기로 복습 자료를 만드는 데 걸리는 시간 (분)',
   confidence: '평소 방식으로 복습했을 때, 이런 퀴즈를 풀 자신감 (1–5)',
   progressOff: '앱이 제안한 진도선(“오늘 어디까지”)이 실제 수업과 맞았나요?',
 };
@@ -154,8 +154,8 @@ export function buildSurveyResult(answers, meta = {}, now = new Date()) {
     `- 평소 방식의 퀴즈 자신감: ${stars(baseline.confidence)}`,
     '',
     '[이번에 앱이 잰 값 (자동)]',
-    `- 입력 시작 → 해설지: ${meta.toGuideMs != null ? formatDuration(meta.toGuideMs) : '측정 안 됨'}`,
-    `- 회상 퀴즈 첫 시도 ${pct(measured.quizFirstPct)} → 다시 풀기 후 ${pct(measured.quizAfterPct)}${measured.quizTotal ? ` (${measured.quizTotal}문항)` : ''}`,
+    `- 입력 시작 → 복습 노트: ${meta.toGuideMs != null ? formatDuration(meta.toGuideMs) : '측정 안 됨'}`,
+    `- 떠올리기 퀴즈 첫 시도 ${pct(measured.quizFirstPct)} → 다시 풀기 후 ${pct(measured.quizAfterPct)}${measured.quizTotal ? ` (${measured.quizTotal}문항)` : ''}`,
     `- 진도선: 전체 ${measured.slides ?? '—'}쪽 중 제안 ${measured.suggested ?? '—'}쪽 → 최종 ${measured.progress ?? '—'}쪽${measured.adjusted ? ` (직접 ${measured.adjusted > 0 ? '+' : ''}${measured.adjusted}쪽 조정)` : ''}`,
     `- 필기: 필기 있음 ${measured.noted ?? '—'}쪽 · 필기 조금 ${measured.light ?? '—'}쪽 · 강조 ${measured.emphasis ?? '—'}곳 · 타이핑 필기 ${measured.noteLines ?? '—'}줄${inkText ? ` · ${inkText}` : ''}`,
     `- 엔진: ${measured.engine ?? '—'}${measured.demo ? ' (예시 데이터)' : ''}`,

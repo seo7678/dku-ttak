@@ -53,7 +53,7 @@ export function buildPrompt({ course, week, slides, notes = [], coverage, progre
   const kind = INK_KIND[ink?.kind] || INK_KIND.mine;
   const inkPages = (ink?.pages || []).filter((p) => p <= progress);
   const L = [];
-  L.push(`너는 대학 강의 복습용 "강의 해설지"를 만드는 조교다. 아래 [교안]과 [필기]만 근거로, 오늘 수업에서 실제로 나간 ${first}~${progress}쪽에 대해서만 해설지를 만든다.`);
+  L.push(`너는 대학 강의 "복습 노트"를 만드는 조교다. 아래 [교안]과 [필기]만 근거로, 오늘 수업에서 실제로 나간 ${first}~${progress}쪽에 대해서만 복습 노트를 만든다.`);
   L.push('');
   L.push('## 규칙');
   L.push(`1. ${progress}쪽 다음부터는 아직 수업에서 안 나간 내용이다. 그 쪽들의 해설·문제는 절대 만들지 않는다.`);

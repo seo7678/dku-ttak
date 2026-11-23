@@ -1,4 +1,4 @@
-// Local, honest measurement: how long did it take from first input to a usable 해설지 (and quiz)?
+// Local, honest measurement: how long did it take from first input to a usable 복습 노트 (and quiz)?
 // Timestamps only — no content, no identity. Stored in localStorage on the user's device.
 
 export const METRICS_KEY = 'ttak.v1.metrics';

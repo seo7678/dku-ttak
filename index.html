@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://cdn.jsdelivr.net; font-src https://cdn.jsdelivr.net data:; img-src 'self' data: blob:; connect-src 'self' https://generativelanguage.googleapis.com https://cdn.jsdelivr.net; worker-src 'self' blob: https://cdn.jsdelivr.net; frame-src 'none'; object-src 'none'; base-uri 'self'" />
   <meta name="referrer" content="no-referrer" />
-  <title>딱 거기까지 — 오늘 수업이 끝난 데까지만 만드는 AI 해설지</title>
-  <meta name="description" content="강의교안과 내 필기로, 오늘 수업이 실제로 나간 쪽까지만 해설지와 회상 퀴즈를 만듭니다. 교안·필기·AI 보충을 문장마다 구분합니다." />
+  <title>딱 거기까지 — 오늘 배운 데까지만 만드는 AI 복습 노트</title>
+  <meta name="description" content="강의교안과 내 필기로, 오늘 수업이 끝난 쪽까지만 AI 복습 노트와 떠올리기 퀴즈를 만듭니다. 문장마다 교안·필기·AI 보충 중 어디서 왔는지 표시합니다." />
   <meta name="theme-color" content="#ffffff" />
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.css" integrity="sha384-y9k2lBaj/ETgBd4674Kql3098euvZU5fWlBcBBrlROBI6c2KDmjWhd508Rfsx9R/" crossorigin="anonymous" />
@@ -24,7 +24,7 @@
       </a>
       <nav class="nav" aria-label="주요 메뉴">
         <a href="#/make" data-nav="make">만들기</a>
-        <a href="#/guide" data-nav="guide">해설지</a>
+        <a href="#/guide" data-nav="guide">복습 노트</a>
         <a href="#/quiz" data-nav="quiz">퀴즈</a>
         <a href="#/survey" data-nav="survey">후기</a>
         <a href="#/about" data-nav="about">소개</a>
@@ -42,59 +42,68 @@
       <div class="hero">
         <div class="hero__copy">
           <h1 id="home-title" class="hero__title">오늘 수업,<br /><span class="redline">딱 거기까지</span>만.</h1>
-          <p class="hero__lead">교수님이 교안을 다 못 나간 날에도, <strong>실제로 수업한 쪽까지만</strong> 해설지를 만듭니다. 교안과 수업 시간에 적은 내 필기를 쪽마다 짝지어 읽고, 문장마다 <span class="tag tag--slide">교안</span> <span class="tag tag--note">필기</span> <span class="tag tag--ai">AI 보충</span>을 표시해요.</p>
+          <p class="hero__lead">교안 PDF를 AI에게 요약해 달라고 하면, 아직 안 배운 쪽까지 설명이 붙고 수업 시간에 들은 설명은 빠져요. 이 앱은 <strong>오늘 수업이 끝난 쪽까지만</strong>, 교안과 내 필기를 함께 써서 AI 복습 노트를 만들어요. 문장마다 <span class="tag tag--slide">교안</span> <span class="tag tag--note">필기</span> <span class="tag tag--ai">AI 보충</span> 중 어디서 왔는지 표시해요.</p>
           <div class="hero__cta">
             <button class="btn btn--primary btn--lg" type="button" data-action="demo-start">예시 수업으로 30초 체험</button>
             <a class="btn btn--ghost btn--lg" href="#/make">내 수업으로 만들기</a>
           </div>
-          <p class="hero__note">가입 없음 · 무료 · 교안과 필기는 이 브라우저 안에서만 처리돼요</p>
+          <p class="hero__note">가입 없음 · 무료 · 이 사이트에는 서버가 없어서 아무것도 올라가지 않아요. 복습 노트를 AI로 만들 때만 내용이 내가 고른 AI로 가요.</p>
         </div>
         <figure class="hero__visual" aria-label="예시: 12쪽짜리 교안 중 8쪽에서 수업이 끝남">
           <div class="mini-strip" id="hero-strip"></div>
-          <figcaption>예시 · 12쪽 교안 중 <b>8쪽</b>에서 수업 종료 → 해설지는 1–8쪽만, 9–12쪽은 “다음 수업 예고”</figcaption>
+          <figcaption>예시 · 교안 12쪽 중 <b>8쪽</b>에서 수업이 끝난 날. 복습 노트는 1–8쪽만 만들고, 9–12쪽은 제목만 “다음 수업 예고”로 보여 줘요.</figcaption>
+          <ul class="legend" aria-label="그림 읽는 법">
+            <li><i class="sw sw--line"></i>진도선 = 오늘 수업이 끝난 쪽</li>
+            <li><i class="sw sw--ink"></i>필기가 있는 쪽</li>
+            <li><i class="sw sw--light"></i>필기가 짧게 있는 쪽 (배운 쪽으로 셈)</li>
+            <li><i class="sw sw--none"></i>필기가 없는 쪽</li>
+            <li><i class="sw sw--em"></i>중요·시험 같은 강조 필기</li>
+          </ul>
         </figure>
       </div>
 
       <div class="band">
-        <h2 class="band__title">만든 이유</h2>
+        <h2 class="band__title">이럴 때 써요</h2>
         <ol class="reasons">
           <li>
-            <blockquote>
-              <p>“수업을 나갔는데 교안을 다 안 끝내서 그다음 주에 마저 나가는 거지. 그러면 <mark>불완전한 해설지</mark>가 만들어져. 이걸 막고 싶었어.”</p>
-              <cite>— 2026-10-01 기록</cite>
-            </blockquote>
-            <p class="reason__then">→ 필기가 있는 마지막 쪽으로 <b>진도선</b>을 찾아, 거기까지만 만든다</p>
+            <p class="reason__text">교안 41쪽 중 33쪽까지 나가고 “나머지는 다음 시간에” 하고 끝난 날. 교안 PDF를 통째로 AI에게 요약시키면 아직 안 배운 34–41쪽까지 설명이 붙어서, 어디까지가 배운 범위인지 다시 골라내야 해요.</p>
+            <p class="reason__then">→ 필기가 있는 마지막 쪽으로 <b>진도선</b>(오늘 수업이 끝난 쪽)을 찾고, 거기까지만 노트를 만들어요.</p>
           </li>
           <li>
-            <p class="reason__text">교안만 보면 수업 중에 덧붙은 설명이 빠지고, 필기만 보면 앞뒤 맥락이 끊긴다.</p>
-            <p class="reason__then">→ <b>교안 + 내 필기</b>를 쪽마다 짝지어 함께 쓴다</p>
+            <p class="reason__text">교수님이 “이건 시험에 나와요” 하신 말, 칠판에 푸신 예제는 교안 PDF에 없어요. 내 필기나 교수님 판서에만 남아 있어서, 교안만 넣은 AI 요약에는 빠져요.</p>
+            <p class="reason__then">→ <b>교안과 내 필기</b>를 쪽마다 짝지어 함께 넣고, 필기에서 온 문장은 <b>필기</b>로 표시해요.</p>
+          </li>
+          <li>
+            <p class="reason__text">시험 전에 몇 주치를 몰아서 복습하는데, 주차마다 수업이 어디서 끝났는지 기억나지 않을 때.</p>
+            <p class="reason__then">→ 과목별로 주차마다 끝난 쪽을 이 브라우저에 기억해 두고, 다음 주차는 거기서 이어서 만들어요.</p>
           </li>
         </ol>
+        <p class="maker">기계공학과 학생이 이번 학기 5과목 40개 단원을 이렇게 복습하다가 만들었어요.</p>
       </div>
 
       <div class="band">
         <h2 class="band__title">이렇게 동작해요</h2>
         <ol class="steps">
-          <li><b>넣기.</b>교안 PDF와 내 필기를 넣어요. 필기한 교안 PDF(굿노트·노타빌리티·삼성노트 내보내기), 교수님이 올려 주신 판서본, 타이핑한 필기 모두 돼요.</li>
-          <li><b>진도 확인.</b>브라우저가 AI 없이 쪽마다 필기가 있는지 보고, 필기가 있는 마지막 쪽을 진도선으로 제안해요. “오늘 어디까지 나갔나요?”에 확인만 하면 돼요.</li>
-          <li><b>해설지 · 퀴즈.</b>진도선 안쪽만 담은 프롬프트를 내 AI 채팅에 붙여넣거나 Gemini 키로 해설지를 만들고, 답을 먼저 떠올리는 퀴즈로 복습해요.</li>
+          <li><b>넣기.</b>교수님이 올려 주신 교안 PDF와 내 필기를 넣어요. 필기는 태블릿으로 교안에 적은 PDF(굿노트·노타빌리티·삼성노트에서 내보내기), 교수님 판서본(수업 뒤 교수님이 올려 주신 필기 포함 교안), 타이핑한 필기 모두 돼요. 종이 노트도 돼요: 사진을 찍어 평소 쓰는 AI 채팅에 보내고, 앱의 “필기 옮겨 적기” 프롬프트로 글자로 옮긴 뒤 붙여넣으면 돼요.</li>
+          <li><b>진도 확인.</b>앱이 쪽마다 필기가 있는지 보고, 필기가 있는 마지막 쪽을 진도선으로 제안해요. 이 단계는 AI를 쓰지 않고 정해진 규칙으로 계산해요. 틀리면 선을 끌어서 옮기면 돼요.</li>
+          <li><b>복습 노트 · 퀴즈.</b>진도선 안쪽 교안과 필기만 담은 요청문(프롬프트)을 복사해 ChatGPT·Gemini·Claude에 붙여넣고, AI의 답을 다시 앱에 붙여넣으면 복습 노트가 돼요(무료). Gemini API 키가 있으면 버튼 한 번으로 만들 수도 있어요. 다 읽은 뒤에는 <strong>떠올리기 퀴즈</strong>로 복습해요. 정답을 보기 전에 내 답부터 쓰는 퀴즈예요.</li>
         </ol>
       </div>
 
       <div class="band">
         <h2 class="band__title">그 밖에</h2>
-        <p class="prose-band">해설지의 문장마다 <b>출처 표시</b>(교안 · 필기 · AI 보충)가 붙고, AI가 단 근거 번호는 브라우저가 내 필기와 다시 대조해요. 퀴즈는 정답을 보기 전에 내 답을 먼저 써야 하고, 틀린 문제는 끝에 다시 나와요. 과목별로 “지난주 8쪽에서 멈춤 → 이번 주는 9쪽부터”를 기억해서 다음 주에 이어 쓸 수 있어요.</p>
+        <p class="prose-band">복습 노트의 문장마다 <b>출처 표시</b>(교안 · 필기 · AI 보충)가 붙어요. <b>AI 보충</b>은 교안·필기에 없는데 AI가 덧붙인 설명이라, 교재로 확인하세요. AI가 “필기”라고 표시한 문장도 앱이 내 필기와 다시 맞춰 보고, 필기에 근거가 없으면 AI 보충으로 바꿔 표시해요. 퀴즈에서 틀린 문제는 끝에 다시 나와요.</p>
       </div>
     </section>
 
     <!-- ============ MAKE ============ -->
     <section class="view view--make" data-view="make" aria-labelledby="make-title" hidden>
       <div class="view__head">
-        <h1 id="make-title" class="view__title">해설지 만들기</h1>
+        <h1 id="make-title" class="view__title">복습 노트 만들기</h1>
         <ol class="stepper" aria-label="진행 단계">
           <li data-step="1" class="is-current"><span>1</span>넣기</li>
           <li data-step="2"><span>2</span>진도 확인</li>
-          <li data-step="3"><span>3</span>해설지 생성</li>
+          <li data-step="3"><span>3</span>노트 만들기</li>
         </ol>
       </div>
 
@@ -105,9 +114,9 @@
         <div class="consent" id="consent-make">
           <b>먼저 읽어 주세요</b>
           <ul>
-            <li>교안은 수강생 개인 학습용으로만 사용하고, 해설지·교안을 다른 사람과 공유하지 마세요.</li>
-            <li>처리는 이 브라우저 안에서만 됩니다. 이 사이트에는 서버가 없어요.</li>
-            <li>외부 AI 엔진(내 AI 채팅, Gemini)을 고르면 교안·필기 내용이 그 서비스로 전송됩니다.</li>
+            <li>교안은 수강생 개인 학습용으로만 쓰고, 복습 노트·교안을 다른 사람과 공유하지 마세요.</li>
+            <li>이 사이트에는 서버가 없어서, 교안과 필기가 이 사이트로 올라가지 않아요.</li>
+            <li>복습 노트를 AI로 만들 때만, 진도선 안쪽 교안·필기가 내가 고른 AI(내 AI 채팅 또는 Gemini)로 가요.</li>
           </ul>
         </div>
 
@@ -152,11 +161,11 @@
 
           <div class="note-src">
             <h3 class="note-src__title"><span class="note-src__no">a</span>필기한 교안 PDF</h3>
-            <p class="hint hint--top">굿노트·노타빌리티·삼성노트에서 <b>같은 교안</b>에 필기한 뒤 PDF로 내보낸 파일이에요. 깨끗한 교안과 쪽마다 비교해서 필기가 있는 쪽을 찾아요.</p>
+            <p class="hint hint--top">태블릿의 굿노트·노타빌리티·삼성노트에서 <b>같은 교안</b>에 필기한 뒤 PDF로 내보낸 파일이에요. 깨끗한 교안과 쪽마다 비교해서 필기가 있는 쪽을 찾아요.</p>
             <div class="ink-kind" role="radiogroup" aria-label="이 PDF의 필기는 누구 것인가요">
               <span class="ink-kind__q">이 필기는</span>
               <label class="check"><input type="radio" name="ink-kind" value="mine" checked /> 내 필기</label>
-              <label class="check"><input type="radio" name="ink-kind" value="pan" /> <span>교수님 판서본 <small>(수업 후 올려 주신 필기 포함 교안)</small></span></label>
+              <label class="check"><input type="radio" name="ink-kind" value="pan" /> <span>교수님 판서본 <small>(수업 뒤 교수님이 올려 주신 필기 포함 교안)</small></span></label>
             </div>
             <p class="hint">교수님이 판서본을 올려 주시는 수업이면 그 PDF를 넣으세요 — 판서가 있는 쪽이 실제로 수업한 쪽입니다.</p>
             <label class="drop drop--ink" for="ink-file">
@@ -207,7 +216,8 @@
 
       <!-- STEP 2 -->
       <section class="panel" id="step-coverage" hidden aria-labelledby="cov-title">
-        <h2 class="panel__title" id="cov-title"><span class="panel__no">2</span>오늘 수업 어디까지 나갔나요? <span class="pill pill--det" title="AI를 쓰지 않는 규칙 기반 계산">AI 없이 · 브라우저 계산</span></h2>
+        <h2 class="panel__title" id="cov-title"><span class="panel__no">2</span>오늘 수업 어디까지 나갔나요? <span class="pill pill--det" title="쪽마다 필기가 있는지 세는 계산이라 같은 입력이면 늘 같은 결과가 나와요">AI 안 씀 · 정해진 규칙으로 계산</span></h2>
+        <p class="hint hint--top"><b>진도선</b> = 오늘 수업이 끝난 쪽이에요. 시험 전에 몰아서 할 때는 그 주차 수업이 끝난 쪽으로 맞추세요.</p>
         <div class="cov-summary" id="cov-summary"></div>
         <div class="strip-wrap">
           <div class="strip" id="strip" aria-hidden="true"></div>
@@ -218,52 +228,54 @@
           </div>
           <ul class="legend" aria-label="범례">
             <li><i class="sw sw--ink"></i>필기 있음</li>
-            <li><i class="sw sw--light"></i>필기 조금</li>
+            <li><i class="sw sw--light"></i>필기 조금 = 필기가 짧게 있는 쪽 (배운 쪽으로 셈)</li>
             <li><i class="sw sw--none"></i>필기 없음</li>
-            <li><i class="sw sw--em"></i>강조 표시</li>
-            <li><i class="sw sw--line"></i>진도선 (끌어서 옮기기)</li>
+            <li><i class="sw sw--em"></i>중요·시험 같은 강조 필기</li>
+            <li><i class="sw sw--line"></i>진도선 = 오늘 수업이 끝난 쪽 (끌어서 옮기기)</li>
           </ul>
         </div>
         <div class="cov-grid">
           <div class="card">
             <h3 class="card__title">쪽별 필기량 <small id="amount-sub"></small></h3>
+            <p class="hint hint--top">막대가 높을수록 그 쪽 필기가 많아요. 필기가 끊기는 곳이 보통 수업이 끝난 곳이에요.</p>
             <div class="amount" id="amount"></div>
           </div>
           <div class="card">
             <h3 class="card__title">필기 강조 <small id="em-count"></small></h3>
+            <p class="hint hint--top">★ · ! · 중요 · 시험 같은 표시가 붙은 필기 줄이에요. 끝의 번호(n8)는 타이핑 필기의 몇 번째 줄인지예요.</p>
             <ul class="em-list" id="em-list"></ul>
             <div id="preview-callout"></div>
           </div>
         </div>
         <details class="card details-card">
-          <summary class="card__title">쪽별 필기 보기 <small>어떤 필기 줄이 어느 쪽에 붙었나</small></summary>
+          <summary class="card__title">필기가 어느 쪽에 붙었는지 보기 <small>필기 줄마다 교안 몇 쪽과 짝지었는지</small></summary>
           <ol class="slide-rows" id="slide-rows"></ol>
           <div id="unplaced"></div>
         </details>
         <div class="actions">
-          <button class="btn btn--primary" type="button" id="to-generate">이 진도선으로 해설지 만들기</button>
+          <button class="btn btn--primary" type="button" id="to-generate">이 진도선까지 복습 노트 만들기</button>
           <button class="btn btn--ghost" type="button" data-goto-step="1">입력 고치기</button>
         </div>
       </section>
 
       <!-- STEP 3 -->
       <section class="panel" id="step-generate" hidden aria-labelledby="gen-title">
-        <h2 class="panel__title" id="gen-title"><span class="panel__no">3</span>해설지 생성 <span class="pill" id="gen-range"></span></h2>
-        <div class="seg seg--wide" role="tablist" aria-label="해설지 만드는 방법">
+        <h2 class="panel__title" id="gen-title"><span class="panel__no">3</span>복습 노트 만들기 <span class="pill" id="gen-range"></span></h2>
+        <div class="seg seg--wide" role="tablist" aria-label="복습 노트 만드는 방법">
           <button type="button" role="tab" class="seg__btn" data-engine="demo" id="eng-demo" aria-controls="pane-demo">예시 결과</button>
           <button type="button" role="tab" class="seg__btn" data-engine="paste" id="eng-paste" aria-controls="pane-paste">내 AI 채팅에 붙여넣기 <em>무료</em></button>
           <button type="button" role="tab" class="seg__btn" data-engine="gemini" id="eng-gemini" aria-controls="pane-gemini">Gemini API 키</button>
         </div>
 
         <div class="pane" id="pane-demo" role="tabpanel" aria-labelledby="eng-demo" hidden>
-          <p id="demo-pane-text">예시 수업이라 미리 만들어 둔 해설지를 바로 보여 드려요. (실제 수업에서는 옆의 두 방법으로 만들어요.)</p>
-          <button class="btn btn--primary" type="button" id="demo-guide-btn">예시 해설지 보기</button>
+          <p id="demo-pane-text">예시 수업이라 미리 만들어 둔 복습 노트를 바로 보여 드려요. (내 수업은 옆의 두 방법으로 만들어요.)</p>
+          <button class="btn btn--primary" type="button" id="demo-guide-btn">예시 복습 노트 보기</button>
         </div>
 
         <div class="pane" id="pane-paste" role="tabpanel" aria-labelledby="eng-paste" hidden>
           <ol class="paste-steps">
             <li>
-              <div class="paste-steps__head"><b>프롬프트 복사</b> <span class="hint" id="prompt-meta"></span></div>
+              <div class="paste-steps__head"><b>프롬프트(AI에게 보낼 요청문) 복사</b> <span class="hint" id="prompt-meta"></span></div>
               <div class="actions actions--tight">
                 <button class="btn btn--primary" type="button" id="copy-prompt">프롬프트 복사</button>
                 <details class="inline-details"><summary>내용 보기</summary><label class="sr-only" for="prompt-box">프롬프트</label><textarea id="prompt-box" rows="10" readonly></textarea></details>
@@ -282,7 +294,7 @@
               <div class="paste-steps__head"><label for="reply-box"><b>AI 답변 전체를 여기에 붙여넣기</b></label> <span class="hint">앞뒤 설명이나 ```json 표시가 섞여도 괜찮아요</span></div>
               <textarea id="reply-box" rows="7" placeholder="AI가 보낸 답변을 통째로 붙여넣으세요"></textarea>
               <div class="actions actions--tight">
-                <button class="btn btn--primary" type="button" id="parse-reply">해설지로 바꾸기</button>
+                <button class="btn btn--primary" type="button" id="parse-reply">복습 노트로 바꾸기</button>
               </div>
             </li>
           </ol>
@@ -322,9 +334,9 @@
     <!-- ============ GUIDE ============ -->
     <section class="view view--guide" data-view="guide" aria-labelledby="guide-title" hidden>
       <div id="guide-empty" class="empty" hidden>
-        <h1 class="view__title">아직 만든 해설지가 없어요</h1>
+        <h1 class="view__title">아직 만든 복습 노트가 없어요</h1>
         <p>예시 수업으로 먼저 결과를 보거나, 내 수업으로 만들어 보세요.</p>
-        <div class="actions"><button class="btn btn--primary" type="button" data-action="demo-guide">예시 해설지 보기</button><a class="btn btn--ghost" href="#/make">만들기</a></div>
+        <div class="actions"><button class="btn btn--primary" type="button" data-action="demo-guide">예시 복습 노트 보기</button><a class="btn btn--ghost" href="#/make">만들기</a></div>
       </div>
       <div id="guide-root"></div>
     </section>
@@ -347,62 +359,71 @@
     <!-- ============ ABOUT ============ -->
     <section class="view view--about prose" data-view="about" aria-labelledby="about-title" hidden>
       <h1 id="about-title" class="view__title">만든 사람과 이유</h1>
-      <p class="view__lead">단국대학교 기계공학과 학생이, 제 복습 방식에서 실제로 막혔던 두 지점을 고치려고 만들었습니다.</p>
+      <p class="view__lead">단국대학교 기계공학과 학생이 자기 복습 방식에서 막혔던 두 지점을 고치려고 만들었어요.</p>
 
       <h2>왜 만들었나</h2>
-      <p>저는 교안에 필기하면서 수업을 듣고, 교안과 필기를 합쳐 장별 “강의 해설지”를 만들어 왔습니다. 그러다 두 번 크게 막혔습니다.</p>
+      <p>만든 사람은 교안에 필기하면서 수업을 듣고, 교안과 필기를 합쳐 단원별 복습 노트를 만들어 왔어요. 이번 학기 5과목 40개 단원을 이렇게 복습하다가 두 번 크게 막혔어요. 모두가 이렇게 공부하지는 않지만, 교안 PDF를 AI에게 요약시켜 복습하는 학생이라면 같은 두 문제를 만나요.</p>
       <ol>
-        <li><b>교안을 다 못 나간 날.</b> 수업이 교안의 3분의 2에서 끝나고 나머지는 다음 주에 이어지는 일이 흔합니다. 교안 전체로 해설지를 만들면, 아직 안 배운 부분까지 수업 설명 없이 채워진 <b>불완전한 해설지</b>가 생깁니다. 그래서 필기가 있는 마지막 쪽으로 실제 진도선을 찾고, <b>딱 거기까지만</b> 만들게 했습니다.</li>
-        <li><b>한쪽만 쓰면 정보가 샌다.</b> 교안만으로는 수업 중에 덧붙은 이유·요령·시험 힌트가 빠지고, 필기만으로는 슬라이드의 식과 표, 앞뒤 맥락이 빠집니다. 그래서 <b>쪽마다 교안과 내 필기를 짝지어</b> 함께 쓰게 했습니다.</li>
+        <li><b>교안을 다 못 나간 날.</b> 수업이 교안 중간에서 끝나고 나머지는 다음 주에 이어지는 날이 있어요. 이때 교안 전체를 AI에게 요약시키면, 아직 안 배운 쪽까지 수업 설명 없이 채워진 노트가 나와요. 그래서 필기가 있는 마지막 쪽으로 <b>진도선</b>(오늘 수업이 끝난 쪽)을 찾고, <b>딱 거기까지만</b> 만들게 했어요.</li>
+        <li><b>교안만 넣으면 수업이 빠진다.</b> 교안만으로는 수업 중에 덧붙은 이유·요령·시험 힌트가 빠지고, 필기만으로는 슬라이드의 식과 표, 앞뒤 맥락이 빠져요. 그래서 <b>쪽마다 교안과 내 필기를 짝지어</b> 함께 쓰게 했어요.</li>
       </ol>
-      <p>또 하나, 해설지를 읽기만 하면 아는 것 같은 착각이 남습니다. 그래서 퀴즈는 <b>내 답을 먼저 써야</b> 정답이 열리고, 틀린 문제는 끝에 다시 나오게 했습니다.</p>
+      <p>또 하나, 노트를 읽기만 하면 아는 것 같은 착각이 남아요. 그래서 <b>떠올리기 퀴즈</b>(정답을 보기 전에 내 답부터 쓰는 퀴즈)는 내 답을 먼저 써야 정답이 열리고, 틀린 문제는 끝에 다시 나와요.</p>
 
       <h2 id="why-not-gpt">왜 그냥 ChatGPT가 아닌가</h2>
       <ul class="compare">
-        <li><b>ChatGPT는 우리 반이 어디서 멈췄는지 모릅니다.</b> 교안을 통째로 주면 안 배운 쪽까지 설명합니다. 이 앱은 필기에서 진도선을 먼저 찾고, 학생이 확인한 그 안쪽만 AI에게 보냅니다.</li>
-        <li><b>진도 찾기는 AI가 아니라 규칙 계산입니다.</b> 같은 입력이면 늘 같은 결과가 나오고, 브라우저 안에서 돌며, 결과를 손으로 고칠 수 있습니다.</li>
-        <li><b>문장마다 출처가 붙습니다.</b> <span class="tag tag--slide">교안</span> <span class="tag tag--note">필기</span> <span class="tag tag--ai">AI 보충</span>. AI가 단 근거 번호는 브라우저가 실제 필기와 다시 대조해서, 근거가 없으면 “AI 보충”으로 내립니다.</li>
-        <li><b>퀴즈는 떠올리기가 먼저입니다.</b> 정답을 보기 전에 답을 써야 하고, ○△✕로 스스로 채점한 뒤 틀린 것만 다시 풉니다. 첫 시도와 다시 풀기 점수를 둘 다 보여 줍니다.</li>
+        <li><b>ChatGPT는 내 수업이 어디서 멈췄는지 몰라요.</b> 교안을 통째로 주면 안 배운 쪽까지 설명해요. 이 앱은 필기에서 진도선을 먼저 찾고, 내가 확인한 그 안쪽만 AI에게 보내요.</li>
+        <li><b>진도 찾기에는 AI를 쓰지 않아요.</b> 쪽마다 필기가 있는지 세어 보는 정해진 규칙이라, 같은 입력이면 늘 같은 결과가 나오고 결과를 손으로 고칠 수 있어요.</li>
+        <li><b>문장마다 출처가 붙어요.</b> <span class="tag tag--slide">교안</span> <span class="tag tag--note">필기</span> <span class="tag tag--ai">AI 보충</span>. AI 보충은 교안·필기에 없는데 AI가 덧붙인 설명이라, 교재로 확인하세요. AI가 “필기”라고 단 문장도 앱이 실제 필기와 다시 맞춰 보고, 근거가 없으면 AI 보충으로 바꿔 표시해요.</li>
+        <li><b>퀴즈는 떠올리기가 먼저예요.</b> 정답을 보기 전에 답을 써야 하고, ○△✕로 스스로 채점한 뒤 틀린 것만 다시 풀어요. 첫 시도와 다시 풀기 점수를 둘 다 보여 줘요.</li>
       </ul>
 
       <h2>무엇이 AI이고 무엇이 아닌가</h2>
       <div class="table-wrap">
         <table>
-          <thead><tr><th scope="col">기능</th><th scope="col">방식</th><th scope="col">어디서</th></tr></thead>
+          <thead><tr><th scope="col">하는 일</th><th scope="col">AI를 쓰나요</th><th scope="col">어디서</th></tr></thead>
           <tbody>
-            <tr><td>교안 쪽 나누기 · PDF 글자 읽기</td><td>규칙 (pdf.js)</td><td>내 브라우저</td></tr>
-            <tr><td>필기한 교안에서 필기 있는 쪽 찾기</td><td>규칙 (깨끗한 교안과 쪽마다 픽셀 비교)</td><td>내 브라우저</td></tr>
-            <tr><td>타이핑 필기 ↔ 쪽 짝짓기, 진도선 제안</td><td>규칙 (쪽 번호 표시 + 한글 글자 묶음 TF-IDF 유사도 + 순서 모델)</td><td>내 브라우저</td></tr>
-            <tr><td>★·중요·시험 강조, “다음 시간” 메모 찾기</td><td>규칙 (표시 사전)</td><td>내 브라우저</td></tr>
-            <tr><td>근거 번호 대조 · 진도선 밖 내용 제거</td><td>규칙</td><td>내 브라우저</td></tr>
-            <tr><td>해설 문장 · 회상 문제 쓰기 (Gemini 키: 손글씨 읽기 포함)</td><td><b>생성형 AI</b> (내 ChatGPT/Gemini/Claude 또는 Gemini API)</td><td>내가 고른 AI 서비스</td></tr>
-            <tr><td>주차 기록 · 시간 측정 · 퀴즈 점수</td><td>규칙</td><td>내 브라우저 저장소</td></tr>
+            <tr><td>교안 PDF에서 쪽마다 글자 읽기</td><td>아니요</td><td>내 브라우저</td></tr>
+            <tr><td>필기한 교안에서 필기가 있는 쪽 찾기</td><td>아니요</td><td>내 브라우저</td></tr>
+            <tr><td>타이핑 필기를 교안 쪽과 짝짓고 진도선 제안하기</td><td>아니요</td><td>내 브라우저</td></tr>
+            <tr><td>★·중요·시험 표시와 “다음 시간” 메모 찾기</td><td>아니요</td><td>내 브라우저</td></tr>
+            <tr><td>AI 답의 근거 번호 확인 · 진도선 밖 내용 빼기</td><td>아니요</td><td>내 브라우저</td></tr>
+            <tr><td>복습 노트 문장과 퀴즈 문제 쓰기 (Gemini 키로 만들면 손글씨 읽기 포함)</td><td><b>예</b> — 내가 고른 AI. 요청문을 복사해 내 ChatGPT·Gemini·Claude 창에 붙여넣거나, Gemini API 키로 바로 만들어요</td><td>내가 고른 AI 서비스</td></tr>
+            <tr><td>주차 기록 · 시간 측정 · 퀴즈 점수</td><td>아니요</td><td>이 기기의 브라우저 저장소</td></tr>
           </tbody>
         </table>
       </div>
+      <details class="howto">
+        <summary>기술 설명</summary>
+        <ul>
+          <li>PDF 글자 읽기: pdf.js로 쪽마다 글자를 꺼내요.</li>
+          <li>필기가 있는 쪽 찾기: 깨끗한 교안과 필기한 교안을 같은 크기의 그림으로 바꿔 쪽마다 픽셀을 비교해요. 원본 글자가 1–2px 밀린 것은 필기로 세지 않아요.</li>
+          <li>타이핑 필기 ↔ 쪽 짝짓기: 쪽 번호 표시(p.12, 12쪽 등)를 먼저 쓰고, 번호가 없는 줄은 한글 글자 묶음 TF-IDF 유사도와 필기 순서로 쪽을 정해요.</li>
+          <li>강조 · “다음 시간” 메모: 정해 둔 표시 목록(★, !, 중요, 시험, 외워, 헷갈, 기출 등)으로 찾아요.</li>
+        </ul>
+      </details>
 
       <h2>교안 이용과 개인정보</h2>
       <div class="consent">
         <ul>
-          <li>교안은 수강생 개인 학습용으로만 사용하고, 해설지·교안을 다른 사람과 공유하지 마세요.</li>
-          <li>처리는 이 브라우저 안에서만 됩니다. 이 사이트에는 서버도, 분석·추적 도구도 없습니다.</li>
-          <li>외부 AI 엔진을 고르면 교안·필기 내용이 그 서비스로 전송됩니다: ① 내가 직접 복사해서 내 AI 채팅에 붙여넣는 프롬프트(와 내가 첨부한 필기), ② Gemini 키를 넣고 “Gemini로 만들기”를 눌렀을 때 Google로 가는 같은 프롬프트와 진도선 안쪽 필기한 교안 페이지 그림.</li>
-          <li>주차 기록·최근 해설지·시간 측정은 이 기기의 브라우저 저장소에만 남고, 아래 버튼으로 지울 수 있습니다.</li>
+          <li>교안은 수강생 개인 학습용으로만 쓰고, 복습 노트·교안을 다른 사람과 공유하지 마세요.</li>
+          <li>이 사이트에는 서버가 없어서, 교안과 필기가 이 사이트로 올라가지 않아요. 분석·추적 도구도 없어요.</li>
+          <li>복습 노트를 AI로 만들 때만 내용이 내가 고른 AI로 가요: ① 붙여넣기 방식은 내가 복사해 붙여넣은 요청문(과 내가 첨부한 필기 사진), ② Gemini 키 방식은 “Gemini로 만들기”를 눌렀을 때 같은 요청문과 진도선 안쪽 필기한 교안 페이지 그림이 Google로 가요.</li>
+          <li>주차 기록·최근 복습 노트·시간 측정은 이 기기의 브라우저 저장소에만 남고, 아래 버튼으로 지울 수 있어요.</li>
         </ul>
       </div>
       <p><button class="btn btn--ghost" type="button" id="wipe-data">이 브라우저의 내 기록 모두 지우기</button></p>
 
       <h2>한계 (솔직하게)</h2>
       <ul>
-        <li>진도선은 “필기가 있는 마지막 쪽”입니다. 필기 없이 지나간 쪽이 마지막이었거나, 다음 쪽에 미리 적어 둔 메모가 있으면 틀릴 수 있어요. 그래서 “오늘 어디까지 나갔나요?”에서 꼭 확인하고 옮길 수 있게 했습니다.</li>
-        <li>필기한 교안 비교는 같은 교안 파일에 필기한 경우에 맞습니다. 쪽 순서가 바뀌었거나 다른 판의 교안이면 쪽이 어긋나요 (쪽 수가 다르면 겹치는 쪽만 비교하고 알려 드려요).</li>
-        <li>타이핑 필기의 쪽 번호가 없으면 단어가 겹치는 정도로 쪽을 찾습니다. 교안과 전혀 다른 말로 적으면 틀릴 수 있어요.</li>
-        <li>PDF 속 그림·스캔 이미지의 글자는 읽지 못합니다 (글자가 선택되는 PDF만). 손글씨 내용은 AI 엔진이 읽을 때만 해설에 쓰여요.</li>
-        <li>AI 해설은 틀릴 수 있습니다. “AI 보충” 표시는 특히 교재로 확인해 주세요. 퀴즈 채점은 스스로 합니다 (○△✕).</li>
+        <li>진도선은 “필기가 있는 마지막 쪽”이에요. 필기 없이 지나간 쪽이 마지막이었거나, 다음 쪽에 미리 적어 둔 메모가 있으면 틀릴 수 있어요. 필기를 거의 안 했다면 더 그래요. 그래서 “오늘 수업 어디까지 나갔나요?”에서 꼭 확인하고 선을 옮길 수 있게 했어요.</li>
+        <li>필기한 교안 비교는 같은 교안 파일에 필기한 경우에 맞아요. 쪽 순서가 바뀌었거나 다른 판의 교안이면 쪽이 어긋나요 (쪽 수가 다르면 겹치는 쪽만 비교하고 알려 드려요).</li>
+        <li>타이핑 필기에 쪽 번호가 없으면 단어가 겹치는 정도로 쪽을 찾아요. 교안과 전혀 다른 말로 적으면 틀릴 수 있어요.</li>
+        <li>PDF 속 그림·스캔 이미지의 글자는 읽지 못해요 (마우스로 글자를 끌어 선택할 수 있는 PDF만 돼요). 손글씨 내용은 AI가 읽을 때만 노트에 쓰여요.</li>
+        <li>AI가 쓴 문장은 틀릴 수 있어요. “AI 보충” 표시는 특히 교재로 확인해 주세요. 퀴즈 채점은 스스로 해요 (○△✕).</li>
       </ul>
 
       <h2>예시 데이터</h2>
-      <p>앱에 들어 있는 “공학수치해석 3장” 교안·필기·해설지는 이 앱을 위해 새로 쓴 <b>창작 예시</b>입니다. 실제 교수님의 강의 자료나 실제 학생의 필기가 아닙니다.</p>
+      <p>앱에 들어 있는 “공학수치해석 3장” 교안·필기·복습 노트는 이 앱을 위해 새로 쓴 <b>창작 예시</b>예요. 실제 교수님의 강의 자료나 실제 학생의 필기가 아니에요.</p>
 
       <h2>사용한 공개 도구</h2>
       <p class="small">Pretendard (SIL OFL 1.1) · pdf.js 4.10.38 (Apache-2.0) · qrcode-generator 1.4.4 (MIT). 모두 버전을 고정해 jsDelivr에서 불러옵니다.</p>
@@ -410,7 +431,7 @@
   </main>
 
   <footer class="footer">
-    <p>딱 거기까지 · 2026 단국대학교 CTL Membership 역량 공모전 출품작 · 서버 없음, 추적 없음</p>
+    <p>딱 거기까지 · 2026 단국대학교 CTL Membership 역량 공모전 출품작 (CTL = 단국대 교수학습개발센터) · 서버 없음, 추적 없음</p>
     <p class="small">예시 데이터는 창작물입니다. 교안은 개인 학습용으로만 쓰고 공유하지 마세요.</p>
   </footer>
 

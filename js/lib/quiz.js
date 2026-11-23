@@ -1,4 +1,4 @@
-// 회상 퀴즈 state machine: answer first → reveal → self-grade ○ △ ✕ → ✕/△ come back in a retry round.
+// 떠올리기 퀴즈 (recall quiz) state machine: answer first → reveal → self-grade ○ △ ✕ → ✕/△ come back in a retry round.
 // Pure: every function returns a new state.
 
 export const MARK_SCORE = { o: 1, t: 0.5, x: 0 };

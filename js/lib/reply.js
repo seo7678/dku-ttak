@@ -210,7 +210,7 @@ const QTYPES = ['예측', '개념', '계산'];
  * { slides:[{slide,title,coverage,summary[],notes[],emphasis[],pitfalls[]}], questions:[{slide,type,question,answer,refs}], course, week }
  */
 export function normalizeGuide(raw) {
-  if (!raw || typeof raw !== 'object') throw new ReplyError('JSON 형식이 해설지 형식이 아니에요.', '프롬프트의 스키마대로 다시 요청해 주세요.');
+  if (!raw || typeof raw !== 'object') throw new ReplyError('JSON 형식이 복습 노트 형식이 아니에요.', '프롬프트의 스키마대로 다시 요청해 주세요.');
   const slidesRaw = pick(raw, 'slides');
   if (!Array.isArray(slidesRaw) || !slidesRaw.length) {
     throw new ReplyError('JSON 안에 "slides" 목록이 없어요.', 'AI에게 "스키마의 slides 배열을 포함해서 다시"라고 요청해 주세요.');
